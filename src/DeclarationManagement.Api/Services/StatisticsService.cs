@@ -12,6 +12,9 @@ namespace DeclarationManagement.Api.Services;
 
 public class StatisticsService : IStatisticsService
 {
+    /// <summary>
+    /// 数据库上下文，用于统计查询与导出。
+    /// </summary>
     private readonly AppDbContext _dbContext;
 
     public StatisticsService(AppDbContext dbContext)
@@ -20,15 +23,24 @@ public class StatisticsService : IStatisticsService
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
+    /// <summary>
+    /// 查询统计列表（按筛选条件返回申报集合）。
+    /// </summary>
     public async Task<List<StatisticsItemDto>> QueryAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
+        // q：可继续叠加条件的查询对象
         var q = BuildQuery(query);
+        // data：数据库结果集
         var data = await q.ToListAsync(cancellationToken);
         return data.Select(ToDto).ToList();
     }
 
+    /// <summary>
+    /// 导出 Excel（基于当前筛选结果）。
+    /// </summary>
     public async Task<ExportFileDto> ExportExcelAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
+        // data：待导出的申报数据
         var data = await BuildQuery(query).ToListAsync(cancellationToken);
 
         using var workbook = new XLWorkbook();
@@ -66,18 +78,24 @@ public class StatisticsService : IStatisticsService
         };
     }
 
+    /// <summary>
+    /// 归档导出 ZIP：仅导出初审通过表单，包含 PDF 与附件。
+    /// </summary>
     public async Task<ExportFileDto> ExportArchiveAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
+        // data：归档候选集（只保留初审通过）
         var data = await BuildQuery(query)
             .Where(x => x.CurrentStatus == DeclarationStatus.InitialReviewApproved)
             .Include(x => x.Attachments)
             .ToListAsync(cancellationToken);
 
+        // zipStream：最终压缩包内存流
         await using var zipStream = new MemoryStream();
         using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
         {
             foreach (var d in data)
             {
+                // folder：每个表单归档目录（部门-负责人-项目名称）
                 var folder = Sanitize($"{d.Department?.Name}-{d.PrincipalName}-{d.ProjectName}");
                 var pdfPath = $"{folder}/{folder}.pdf";
                 var pdfEntry = archive.CreateEntry(pdfPath);
@@ -106,6 +124,9 @@ public class StatisticsService : IStatisticsService
         };
     }
 
+    /// <summary>
+    /// 构建统计查询（统一复用筛选逻辑）。
+    /// </summary>
     private IQueryable<Declaration> BuildQuery(StatisticsQueryDto query)
     {
         var q = _dbContext.Declarations
@@ -125,6 +146,9 @@ public class StatisticsService : IStatisticsService
         return q;
     }
 
+    /// <summary>
+    /// 将申报实体映射为统计列表 DTO。
+    /// </summary>
     private static StatisticsItemDto ToDto(Declaration x) => new()
     {
         DeclarationId = x.Id,
@@ -136,6 +160,9 @@ public class StatisticsService : IStatisticsService
         SubmittedAt = x.SubmittedAt
     };
 
+    /// <summary>
+    /// 生成单份申报 PDF。
+    /// </summary>
     private static byte[] BuildDeclarationPdf(Declaration d)
     {
         return Document.Create(container =>
@@ -158,6 +185,9 @@ public class StatisticsService : IStatisticsService
         }).GeneratePdf();
     }
 
+    /// <summary>
+    /// 清理非法文件名字符，避免生成目录失败。
+    /// </summary>
     private static string Sanitize(string name)
     {
         foreach (var c in Path.GetInvalidFileNameChars())
