@@ -9,4 +9,5 @@ public interface IDeclarationService
 {
     Task<DeclarationDetailDto?> GetDetailAsync(long declarationId, CancellationToken cancellationToken = default);
     Task<long> CreateAsync(long applicantUserId, SaveDeclarationRequestDto request, CancellationToken cancellationToken = default);
+    Task<PagedResultDto<DeclarationListItemDto>> GetMyDeclarationsAsync(long applicantUserId, DeclarationPageQueryDto query, CancellationToken cancellationToken = default);
 }

@@ -27,7 +27,6 @@ public class DeclarationService : IDeclarationService
 
     public async Task<long> CreateAsync(long applicantUserId, SaveDeclarationRequestDto request, CancellationToken cancellationToken = default)
     {
-        // 基础状态：先创建为“草稿”，后续可在工作流服务中转“提交/待预审”。
         var entity = _mapper.Map<Declaration>(request);
         entity.ApplicantUserId = applicantUserId;
         entity.CurrentStatus = DeclarationStatus.Draft;
@@ -38,5 +37,31 @@ public class DeclarationService : IDeclarationService
         await _declarationRepository.SaveChangesAsync(cancellationToken);
 
         return entity.Id;
+    }
+
+    public async Task<PagedResultDto<DeclarationListItemDto>> GetMyDeclarationsAsync(long applicantUserId, DeclarationPageQueryDto query, CancellationToken cancellationToken = default)
+    {
+        var list = await _declarationRepository.GetListAsync(x => x.ApplicantUserId == applicantUserId, cancellationToken);
+
+        var items = list
+            .OrderByDescending(x => x.SubmittedAt ?? x.CreatedAt)
+            .Skip((query.PageIndex - 1) * query.PageSize)
+            .Take(query.PageSize)
+            .Select(x => new DeclarationListItemDto
+            {
+                Id = x.Id,
+                ProjectName = x.ProjectName,
+                CurrentStatus = x.CurrentStatus,
+                SubmittedAt = x.SubmittedAt
+            })
+            .ToList();
+
+        return new PagedResultDto<DeclarationListItemDto>
+        {
+            PageIndex = query.PageIndex,
+            PageSize = query.PageSize,
+            TotalCount = list.Count,
+            Items = items
+        };
     }
 }

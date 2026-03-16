@@ -46,3 +46,39 @@ public class DeclarationDetailDto
     public int VersionNo { get; set; }
     public DateTime? SubmittedAt { get; set; }
 }
+
+
+/// <summary>
+/// 我的申报分页查询条件 DTO。
+/// </summary>
+public class DeclarationPageQueryDto
+{
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+}
+
+/// <summary>
+/// 申报分页项 DTO。
+/// </summary>
+public class DeclarationListItemDto
+{
+    public long Id { get; set; }
+    public string ProjectName { get; set; } = string.Empty;
+    public string ProjectCategoryName { get; set; } = string.Empty;
+    public string DepartmentName { get; set; } = string.Empty;
+    public DeclarationStatus CurrentStatus { get; set; }
+    public DateTime? SubmittedAt { get; set; }
+}
+
+/// <summary>
+/// 通用分页响应 DTO。
+/// </summary>
+public class PagedResultDto<T>
+{
+    public int PageIndex { get; set; }
+    public int PageSize { get; set; }
+    public long TotalCount { get; set; }
+    public List<T> Items { get; set; } = new();
+}

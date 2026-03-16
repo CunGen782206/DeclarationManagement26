@@ -20,9 +20,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // AutoMapper 注册
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// Repository 与 Service 注册
+// Repository 注册
 builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+// 模块化 Service 注册
+builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<ITaskService, TaskService>();
 builder.Services.AddScoped<IDeclarationService, DeclarationService>();
+builder.Services.AddScoped<IReviewService, ReviewService>();
+builder.Services.AddScoped<IStatisticsService, StatisticsService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 

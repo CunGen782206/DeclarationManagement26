@@ -46,4 +46,15 @@ public class DeclarationsController : ControllerBase
         var id = await _declarationService.CreateAsync(currentUserId, request, cancellationToken);
         return Ok(ApiResponse<long>.Ok(id, "创建成功"));
     }
+
+    /// <summary>
+    /// 获取我的申报分页列表。
+    /// </summary>
+    [HttpGet("mine")]
+    public async Task<ActionResult<ApiResponse<PagedResultDto<DeclarationListItemDto>>>> Mine([FromQuery] DeclarationPageQueryDto query, CancellationToken cancellationToken)
+    {
+        const long currentUserId = 1;
+        var result = await _declarationService.GetMyDeclarationsAsync(currentUserId, query, cancellationToken);
+        return Ok(ApiResponse<PagedResultDto<DeclarationListItemDto>>.Ok(result));
+    }
 }

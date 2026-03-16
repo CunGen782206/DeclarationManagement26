@@ -34,3 +34,27 @@ public class ReviewRecordDto
     public long ReviewedByUserId { get; set; }
     public DateTime ReviewedAt { get; set; }
 }
+
+
+/// <summary>
+/// 待审核查询条件 DTO。
+/// </summary>
+public class PendingReviewQueryDto
+{
+    public int PageIndex { get; set; } = 1;
+    public int PageSize { get; set; } = 10;
+    public DateTime? StartDate { get; set; }
+    public DateTime? EndDate { get; set; }
+}
+
+/// <summary>
+/// 待审核列表项 DTO。
+/// </summary>
+public class PendingReviewItemDto
+{
+    public long DeclarationId { get; set; }
+    public string ProjectName { get; set; } = string.Empty;
+    public string DepartmentName { get; set; } = string.Empty;
+    public ReviewStage CurrentReviewStage { get; set; }
+    public DateTime? SubmittedAt { get; set; }
+}
