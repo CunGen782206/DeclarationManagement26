@@ -2,9 +2,6 @@ using DeclarationManagement.Api.Entities;
 
 namespace DeclarationManagement.Api.DTOs;
 
-/// <summary>
-/// 审核动作请求 DTO。
-/// </summary>
 public class ReviewActionRequestDto
 {
     public long DeclarationId { get; set; }
@@ -17,9 +14,6 @@ public class ReviewActionRequestDto
     public string? Remark { get; set; }
 }
 
-/// <summary>
-/// 审核记录展示 DTO。
-/// </summary>
 public class ReviewRecordDto
 {
     public long Id { get; set; }
@@ -35,10 +29,6 @@ public class ReviewRecordDto
     public DateTime ReviewedAt { get; set; }
 }
 
-
-/// <summary>
-/// 待审核查询条件 DTO。
-/// </summary>
 public class PendingReviewQueryDto
 {
     public int PageIndex { get; set; } = 1;
@@ -47,9 +37,6 @@ public class PendingReviewQueryDto
     public DateTime? EndDate { get; set; }
 }
 
-/// <summary>
-/// 待审核列表项 DTO。
-/// </summary>
 public class PendingReviewItemDto
 {
     public long DeclarationId { get; set; }

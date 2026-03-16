@@ -1,37 +1,51 @@
+using DeclarationManagement.Api.Data;
 using DeclarationManagement.Api.DTOs;
 using DeclarationManagement.Api.Entities;
-using DeclarationManagement.Api.Repositories;
+using Microsoft.EntityFrameworkCore;
 
 namespace DeclarationManagement.Api.Services;
 
-/// <summary>
-/// 用户服务实现（当前为骨架实现，后续补全权限关联维护逻辑）。
-/// </summary>
 public class UserService : IUserService
 {
-    private readonly IRepository<User> _userRepository;
+    private readonly AppDbContext _dbContext;
 
-    public UserService(IRepository<User> userRepository)
+    public UserService(AppDbContext dbContext)
     {
-        _userRepository = userRepository;
+        _dbContext = dbContext;
     }
 
     public async Task<List<UserDto>> GetListAsync(CancellationToken cancellationToken = default)
     {
-        var users = await _userRepository.GetListAsync(cancellationToken: cancellationToken);
+        var users = await _dbContext.Users
+            .AsNoTracking()
+            .Include(x => x.Department)
+            .Include(x => x.UserPreReviewDepartments)
+            .Include(x => x.UserInitialReviewCategories)
+            .ToListAsync(cancellationToken);
+
         return users.Select(x => new UserDto
         {
             Id = x.Id,
             JobNumber = x.JobNumber,
             FullName = x.FullName,
             DepartmentId = x.DepartmentId,
+            DepartmentName = x.Department?.Name ?? string.Empty,
             IsSuperAdmin = x.IsSuperAdmin,
-            IsEnabled = x.IsEnabled
+            IsEnabled = x.IsEnabled,
+            PreReviewDepartmentIds = x.UserPreReviewDepartments.Select(i => i.DepartmentId).ToList(),
+            InitialReviewCategoryIds = x.UserInitialReviewCategories.Select(i => i.ProjectCategoryId).ToList()
         }).ToList();
     }
 
     public async Task<long> CreateAsync(CreateUserRequestDto request, CancellationToken cancellationToken = default)
     {
+        var existed = await _dbContext.Users.AnyAsync(x => x.JobNumber == request.JobNumber, cancellationToken);
+        if (existed)
+        {
+            throw new InvalidOperationException("工号已存在");
+        }
+
+        var (hash, salt) = PasswordHasher.Hash("111111");
         var user = new User
         {
             JobNumber = request.JobNumber,
@@ -39,18 +53,21 @@ public class UserService : IUserService
             DepartmentId = request.DepartmentId,
             IsSuperAdmin = request.IsSuperAdmin,
             IsEnabled = true,
-            PasswordHash = "TODO_HASH_111111",
+            PasswordHash = hash,
+            PasswordSalt = salt,
             CreatedAt = DateTime.UtcNow
         };
 
-        await _userRepository.AddAsync(user, cancellationToken);
-        await _userRepository.SaveChangesAsync(cancellationToken);
+        await _dbContext.Users.AddAsync(user, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        await ReplacePermissionsAsync(user.Id, request.PreReviewDepartmentIds, request.InitialReviewCategoryIds, cancellationToken);
         return user.Id;
     }
 
     public async Task UpdateAsync(long userId, UpdateUserRequestDto request, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetByIdAsync(userId, cancellationToken)
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
                    ?? throw new InvalidOperationException("用户不存在");
 
         user.FullName = request.FullName;
@@ -59,29 +76,59 @@ public class UserService : IUserService
         user.IsSuperAdmin = request.IsSuperAdmin;
         user.UpdatedAt = DateTime.UtcNow;
 
-        _userRepository.Update(user);
-        await _userRepository.SaveChangesAsync(cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        await ReplacePermissionsAsync(user.Id, request.PreReviewDepartmentIds, request.InitialReviewCategoryIds, cancellationToken);
     }
 
     public async Task DeleteAsync(long userId, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetByIdAsync(userId, cancellationToken)
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
                    ?? throw new InvalidOperationException("用户不存在");
 
-        _userRepository.Remove(user);
-        await _userRepository.SaveChangesAsync(cancellationToken);
+        _dbContext.Users.Remove(user);
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
     public async Task ResetPasswordAsync(long userId, CancellationToken cancellationToken = default)
     {
-        var user = await _userRepository.GetByIdAsync(userId, cancellationToken)
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
                    ?? throw new InvalidOperationException("用户不存在");
 
-        // TODO: 替换为真实密码哈希。
-        user.PasswordHash = "TODO_HASH_111111";
+        var (hash, salt) = PasswordHasher.Hash("111111");
+        user.PasswordHash = hash;
+        user.PasswordSalt = salt;
         user.UpdatedAt = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
 
-        _userRepository.Update(user);
-        await _userRepository.SaveChangesAsync(cancellationToken);
+    private async Task ReplacePermissionsAsync(long userId, List<long> preReviewDepartmentIds, List<long> initialReviewCategoryIds, CancellationToken cancellationToken)
+    {
+        var preRecords = await _dbContext.UserPreReviewDepartments.Where(x => x.UserId == userId).ToListAsync(cancellationToken);
+        _dbContext.UserPreReviewDepartments.RemoveRange(preRecords);
+
+        var initRecords = await _dbContext.UserInitialReviewCategories.Where(x => x.UserId == userId).ToListAsync(cancellationToken);
+        _dbContext.UserInitialReviewCategories.RemoveRange(initRecords);
+
+        if (preReviewDepartmentIds.Count > 0)
+        {
+            await _dbContext.UserPreReviewDepartments.AddRangeAsync(preReviewDepartmentIds.Distinct().Select(x => new UserPreReviewDepartment
+            {
+                UserId = userId,
+                DepartmentId = x,
+                CreatedAt = DateTime.UtcNow
+            }), cancellationToken);
+        }
+
+        if (initialReviewCategoryIds.Count > 0)
+        {
+            await _dbContext.UserInitialReviewCategories.AddRangeAsync(initialReviewCategoryIds.Distinct().Select(x => new UserInitialReviewCategory
+            {
+                UserId = userId,
+                ProjectCategoryId = x,
+                CreatedAt = DateTime.UtcNow
+            }), cancellationToken);
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
     }
 }

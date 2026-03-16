@@ -1,14 +1,14 @@
+using DeclarationManagement.Api.Common;
 using DeclarationManagement.Api.DTOs;
 using DeclarationManagement.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
-/// <summary>
-/// 申报任务控制器。
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class TasksController : ControllerBase
 {
     private readonly ITaskService _taskService;
@@ -28,8 +28,7 @@ public class TasksController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<ApiResponse<long>>> Create([FromBody] CreateTaskRequestDto request, CancellationToken cancellationToken)
     {
-        const long currentUserId = 1;
-        var id = await _taskService.CreateAsync(currentUserId, request, cancellationToken);
+        var id = await _taskService.CreateAsync(User.GetUserId(), request, cancellationToken);
         return Ok(ApiResponse<long>.Ok(id, "创建成功"));
     }
 
@@ -37,6 +36,13 @@ public class TasksController : ControllerBase
     public async Task<ActionResult<ApiResponse<string>>> UpdateWindow(long id, [FromBody] UpdateTaskWindowRequestDto request, CancellationToken cancellationToken)
     {
         await _taskService.UpdateWindowAsync(id, request, cancellationToken);
+        return Ok(ApiResponse<string>.Ok("OK", "修改成功"));
+    }
+
+    [HttpPut("{id:long}/status")]
+    public async Task<ActionResult<ApiResponse<string>>> UpdateStatus(long id, [FromBody] UpdateTaskStatusRequestDto request, CancellationToken cancellationToken)
+    {
+        await _taskService.UpdateStatusAsync(id, request, cancellationToken);
         return Ok(ApiResponse<string>.Ok("OK", "修改成功"));
     }
 }

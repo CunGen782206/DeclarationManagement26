@@ -1,14 +1,13 @@
 using DeclarationManagement.Api.DTOs;
 using DeclarationManagement.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
-/// <summary>
-/// 统计与导出控制器。
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class StatisticsController : ControllerBase
 {
     private readonly IStatisticsService _statisticsService;

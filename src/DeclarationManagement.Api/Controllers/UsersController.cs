@@ -1,14 +1,13 @@
 using DeclarationManagement.Api.DTOs;
 using DeclarationManagement.Api.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
-/// <summary>
-/// 用户管理控制器。
-/// </summary>
 [ApiController]
 [Route("api/[controller]")]
+[Authorize]
 public class UsersController : ControllerBase
 {
     private readonly IUserService _userService;
