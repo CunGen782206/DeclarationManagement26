@@ -9,12 +9,12 @@ namespace DeclarationManagement.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 /// <summary>
-/// AuthController 类。
+/// AuthController类。
 /// </summary>
 public class AuthController : ControllerBase
 {
     /// <summary>
-    /// _authService 字段。
+    /// auth服务字段。
     /// </summary>
     private readonly IAuthService _authService;
 
@@ -33,7 +33,7 @@ public class AuthController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<LoginResponseDto>>> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
     {
-        var result = await _authService.LoginAsync(request, cancellationToken);
+        var result = await _authService.LoginAsync(request, cancellationToken); // result：结果
         return Ok(ApiResponse<LoginResponseDto>.Ok(result));
     }
 
@@ -44,8 +44,8 @@ public class AuthController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<CurrentUserDto>>> Me(CancellationToken cancellationToken)
     {
-        var currentUserId = User.GetUserId();
-        var result = await _authService.GetCurrentUserAsync(currentUserId, cancellationToken);
+        var currentUserId = User.GetUserId(); // currentUserId：当前用户ID
+        var result = await _authService.GetCurrentUserAsync(currentUserId, cancellationToken); // result：结果
         return Ok(ApiResponse<CurrentUserDto>.Ok(result));
     }
 

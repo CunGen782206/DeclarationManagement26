@@ -6,24 +6,24 @@ namespace DeclarationManagement.Api.Entities;
 public class ProjectCategory : BaseEntity
 {
     /// <summary>
-    /// Name 属性。
+    /// 名称属性。
     /// </summary>
     public string Name { get; set; } = string.Empty;
     /// <summary>
-    /// SortOrder 属性。
+    /// SortOrder属性。
     /// </summary>
     public int SortOrder { get; set; }
     /// <summary>
-    /// IsEnabled 属性。
+    /// 是否启用属性。
     /// </summary>
     public bool IsEnabled { get; set; } = true;
 
     /// <summary>
-    /// Declarations 属性。
+    /// Declarations属性。
     /// </summary>
     public ICollection<Declaration> Declarations { get; set; } = new List<Declaration>();
     /// <summary>
-    /// UserInitialReviewCategories 属性。
+    /// 用户初审核Categories属性。
     /// </summary>
     public ICollection<UserInitialReviewCategory> UserInitialReviewCategories { get; set; } = new List<UserInitialReviewCategory>();
 }

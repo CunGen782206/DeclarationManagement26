@@ -3,7 +3,7 @@ using DeclarationManagement.Api.DTOs;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// IAuthService 接口。
+/// IAuth服务接口。
 /// </summary>
 public interface IAuthService
 {

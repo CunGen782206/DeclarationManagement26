@@ -6,24 +6,24 @@ namespace DeclarationManagement.Api.Entities;
 public class UserPreReviewDepartment
 {
     /// <summary>
-    /// UserId 属性。
+    /// 用户ID属性。
     /// </summary>
     public long UserId { get; set; }
     /// <summary>
-    /// DepartmentId 属性。
+    /// 部门ID属性。
     /// </summary>
     public long DepartmentId { get; set; }
     /// <summary>
-    /// CreatedAt 属性。
+    /// 创建时间时间属性。
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
     /// <summary>
-    /// User 属性。
+    /// 用户属性。
     /// </summary>
     public User? User { get; set; }
     /// <summary>
-    /// Department 属性。
+    /// 部门属性。
     /// </summary>
     public Department? Department { get; set; }
 }

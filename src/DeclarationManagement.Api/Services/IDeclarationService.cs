@@ -3,7 +3,7 @@ using DeclarationManagement.Api.DTOs;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// IDeclarationService 接口。
+/// IDeclaration服务接口。
 /// </summary>
 public interface IDeclarationService
 {

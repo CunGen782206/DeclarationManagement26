@@ -1,73 +1,73 @@
 namespace DeclarationManagement.Api.DTOs;
 
 /// <summary>
-/// TaskDto 类。
+/// 任务数据传输对象类。
 /// </summary>
 public class TaskDto
 {
     /// <summary>
-    /// Id 属性。
+    /// ID属性。
     /// </summary>
     public long Id { get; set; }
     /// <summary>
-    /// TaskName 属性。
+    /// 任务名称属性。
     /// </summary>
     public string TaskName { get; set; } = string.Empty;
     /// <summary>
-    /// StartAt 属性。
+    /// 开始时间属性。
     /// </summary>
     public DateTime StartAt { get; set; }
     /// <summary>
-    /// EndAt 属性。
+    /// 结束时间属性。
     /// </summary>
     public DateTime EndAt { get; set; }
     /// <summary>
-    /// IsEnabled 属性。
+    /// 是否启用属性。
     /// </summary>
     public bool IsEnabled { get; set; }
 }
 
 /// <summary>
-/// CreateTaskRequestDto 类。
+/// Create任务请求数据传输对象类。
 /// </summary>
 public class CreateTaskRequestDto
 {
     /// <summary>
-    /// TaskName 属性。
+    /// 任务名称属性。
     /// </summary>
     public string TaskName { get; set; } = string.Empty;
     /// <summary>
-    /// StartAt 属性。
+    /// 开始时间属性。
     /// </summary>
     public DateTime StartAt { get; set; }
     /// <summary>
-    /// EndAt 属性。
+    /// 结束时间属性。
     /// </summary>
     public DateTime EndAt { get; set; }
 }
 
 /// <summary>
-/// UpdateTaskWindowRequestDto 类。
+/// Update任务Window请求数据传输对象类。
 /// </summary>
 public class UpdateTaskWindowRequestDto
 {
     /// <summary>
-    /// StartAt 属性。
+    /// 开始时间属性。
     /// </summary>
     public DateTime StartAt { get; set; }
     /// <summary>
-    /// EndAt 属性。
+    /// 结束时间属性。
     /// </summary>
     public DateTime EndAt { get; set; }
 }
 
 /// <summary>
-/// UpdateTaskStatusRequestDto 类。
+/// Update任务状态请求数据传输对象类。
 /// </summary>
 public class UpdateTaskStatusRequestDto
 {
     /// <summary>
-    /// IsEnabled 属性。
+    /// 是否启用属性。
     /// </summary>
     public bool IsEnabled { get; set; }
 }

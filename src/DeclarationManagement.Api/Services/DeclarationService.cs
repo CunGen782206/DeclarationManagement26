@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// DeclarationService 类。
+/// 申报服务类。
 /// </summary>
 public class DeclarationService : IDeclarationService
 {
@@ -48,7 +48,7 @@ public class DeclarationService : IDeclarationService
             .Include(x => x.ProjectCategory)
             .FirstOrDefaultAsync(x => x.Id == declarationId, cancellationToken);
 
-        return declaration == null ? null : _mapper.Map<DeclarationDetailDto>(declaration);
+        return declaration == null ? null : _mapper.Map<DeclarationDetailDto>(declaration); // declaration：申报单
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class DeclarationService : IDeclarationService
     public async Task<long> CreateAsync(long applicantUserId, SaveDeclarationRequestDto request, CancellationToken cancellationToken = default)
     {
         // entity：待持久化的申报主表实体
-        var entity = _mapper.Map<Declaration>(request);
+        var entity = _mapper.Map<Declaration>(request); // entity：实体
         entity.ApplicantUserId = applicantUserId;
         entity.CurrentStatus = DeclarationStatus.Draft;
         entity.CurrentNode = DeclarationNode.Declaration;
@@ -121,14 +121,14 @@ public class DeclarationService : IDeclarationService
                    ?? throw new InvalidOperationException("申报任务不存在");
 
         // now：统一时间戳，保证状态与日志时间一致
-        var now = DateTime.UtcNow;
+        var now = DateTime.UtcNow; // now：当前时间
         if (!task.IsEnabled || now < task.StartAt || now > task.EndAt)
         {
             throw new InvalidOperationException($"不在申报时间窗内：{task.StartAt:yyyy-MM-dd HH:mm:ss} ~ {task.EndAt:yyyy-MM-dd HH:mm:ss}");
         }
 
         // fromStatus：记录提交前状态，用于流程日志追踪
-        var fromStatus = entity.CurrentStatus;
+        var fromStatus = entity.CurrentStatus; // fromStatus：来源状态
         entity.CurrentStatus = DeclarationStatus.PendingPreReview;
         entity.CurrentNode = DeclarationNode.PreReview;
         entity.SubmittedAt = now;
@@ -193,7 +193,7 @@ public class DeclarationService : IDeclarationService
         }
 
         // total：筛选后的总记录数，用于分页展示
-        var total = await q.LongCountAsync(cancellationToken);
+        var total = await q.LongCountAsync(cancellationToken); // total：总数
         // list：当前页数据
         var list = await q.OrderByDescending(x => x.SubmittedAt ?? x.CreatedAt)
             .Skip((query.PageIndex - 1) * query.PageSize)
@@ -237,7 +237,7 @@ public class DeclarationService : IDeclarationService
         }
 
         // saved：文件系统落盘结果（存储路径/名称/大小）
-        var saved = await _fileStorageService.SaveAsync(file, $"declarations/{declarationId}", cancellationToken);
+        var saved = await _fileStorageService.SaveAsync(file, $"declarations/{declarationId}", cancellationToken); // saved：saved
         // attachment：附件表记录
         var attachment = new DeclarationAttachment
         {
@@ -271,7 +271,7 @@ public class DeclarationService : IDeclarationService
             ?? throw new InvalidOperationException("附件不存在");
 
         // bytes：附件二进制内容
-        var bytes = await _fileStorageService.ReadAsync(attachment.StoragePath, cancellationToken);
+        var bytes = await _fileStorageService.ReadAsync(attachment.StoragePath, cancellationToken); // bytes：字节
         return (bytes, attachment.OriginalFileName, attachment.ContentType ?? "application/octet-stream");
     }
 

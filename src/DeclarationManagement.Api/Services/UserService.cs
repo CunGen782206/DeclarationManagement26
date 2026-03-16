@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// UserService 类。
+/// 用户服务类。
 /// </summary>
 public class UserService : IUserService
 {
     /// <summary>
-    /// _dbContext 字段。
+    /// 数据库上下文字段。
     /// </summary>
     private readonly AppDbContext _dbContext;
 
@@ -54,7 +54,7 @@ public class UserService : IUserService
     /// </summary>
     public async Task<long> CreateAsync(CreateUserRequestDto request, CancellationToken cancellationToken = default)
     {
-        var existed = await _dbContext.Users.AnyAsync(x => x.JobNumber == request.JobNumber, cancellationToken);
+        var existed = await _dbContext.Users.AnyAsync(x => x.JobNumber == request.JobNumber, cancellationToken); // existed：existed
         if (existed)
         {
             throw new InvalidOperationException("工号已存在");
@@ -130,10 +130,10 @@ public class UserService : IUserService
     /// </summary>
     private async Task ReplacePermissionsAsync(long userId, List<long> preReviewDepartmentIds, List<long> initialReviewCategoryIds, CancellationToken cancellationToken)
     {
-        var preRecords = await _dbContext.UserPreReviewDepartments.Where(x => x.UserId == userId).ToListAsync(cancellationToken);
+        var preRecords = await _dbContext.UserPreReviewDepartments.Where(x => x.UserId == userId).ToListAsync(cancellationToken); // preRecords：预Records
         _dbContext.UserPreReviewDepartments.RemoveRange(preRecords);
 
-        var initRecords = await _dbContext.UserInitialReviewCategories.Where(x => x.UserId == userId).ToListAsync(cancellationToken);
+        var initRecords = await _dbContext.UserInitialReviewCategories.Where(x => x.UserId == userId).ToListAsync(cancellationToken); // initRecords：initRecords
         _dbContext.UserInitialReviewCategories.RemoveRange(initRecords);
 
         if (preReviewDepartmentIds.Count > 0)

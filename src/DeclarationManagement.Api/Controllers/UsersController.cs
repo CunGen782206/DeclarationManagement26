@@ -9,12 +9,12 @@ namespace DeclarationManagement.Api.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 /// <summary>
-/// UsersController 类。
+/// 用户Controller类。
 /// </summary>
 public class UsersController : ControllerBase
 {
     /// <summary>
-    /// _userService 字段。
+    /// 用户服务字段。
     /// </summary>
     private readonly IUserService _userService;
 
@@ -32,7 +32,7 @@ public class UsersController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<List<UserDto>>>> GetList(CancellationToken cancellationToken)
     {
-        var result = await _userService.GetListAsync(cancellationToken);
+        var result = await _userService.GetListAsync(cancellationToken); // result：结果
         return Ok(ApiResponse<List<UserDto>>.Ok(result));
     }
 
@@ -42,7 +42,7 @@ public class UsersController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<long>>> Create([FromBody] CreateUserRequestDto request, CancellationToken cancellationToken)
     {
-        var id = await _userService.CreateAsync(request, cancellationToken);
+        var id = await _userService.CreateAsync(request, cancellationToken); // id：ID
         return Ok(ApiResponse<long>.Ok(id, "创建成功"));
     }
 

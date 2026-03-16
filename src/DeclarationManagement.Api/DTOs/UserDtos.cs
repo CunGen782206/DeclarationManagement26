@@ -1,106 +1,106 @@
 namespace DeclarationManagement.Api.DTOs;
 
 /// <summary>
-/// UserDto 类。
+/// 用户数据传输对象类。
 /// </summary>
 public class UserDto
 {
     /// <summary>
-    /// Id 属性。
+    /// ID属性。
     /// </summary>
     public long Id { get; set; }
     /// <summary>
-    /// JobNumber 属性。
+    /// 工号编号属性。
     /// </summary>
     public string JobNumber { get; set; } = string.Empty;
     /// <summary>
-    /// FullName 属性。
+    /// 姓名属性。
     /// </summary>
     public string FullName { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentId 属性。
+    /// 部门ID属性。
     /// </summary>
     public long DepartmentId { get; set; }
     /// <summary>
-    /// DepartmentName 属性。
+    /// 部门名称属性。
     /// </summary>
     public string DepartmentName { get; set; } = string.Empty;
     /// <summary>
-    /// IsSuperAdmin 属性。
+    /// 是否超级管理员属性。
     /// </summary>
     public bool IsSuperAdmin { get; set; }
     /// <summary>
-    /// IsEnabled 属性。
+    /// 是否启用属性。
     /// </summary>
     public bool IsEnabled { get; set; }
     /// <summary>
-    /// PreReviewDepartmentIds 属性。
+    /// 预审核部门Ids属性。
     /// </summary>
     public List<long> PreReviewDepartmentIds { get; set; } = new();
     /// <summary>
-    /// InitialReviewCategoryIds 属性。
+    /// 初审核类别Ids属性。
     /// </summary>
     public List<long> InitialReviewCategoryIds { get; set; } = new();
 }
 
 /// <summary>
-/// CreateUserRequestDto 类。
+/// Create用户请求数据传输对象类。
 /// </summary>
 public class CreateUserRequestDto
 {
     /// <summary>
-    /// JobNumber 属性。
+    /// 工号编号属性。
     /// </summary>
     public string JobNumber { get; set; } = string.Empty;
     /// <summary>
-    /// FullName 属性。
+    /// 姓名属性。
     /// </summary>
     public string FullName { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentId 属性。
+    /// 部门ID属性。
     /// </summary>
     public long DepartmentId { get; set; }
     /// <summary>
-    /// IsSuperAdmin 属性。
+    /// 是否超级管理员属性。
     /// </summary>
     public bool IsSuperAdmin { get; set; }
     /// <summary>
-    /// PreReviewDepartmentIds 属性。
+    /// 预审核部门Ids属性。
     /// </summary>
     public List<long> PreReviewDepartmentIds { get; set; } = new();
     /// <summary>
-    /// InitialReviewCategoryIds 属性。
+    /// 初审核类别Ids属性。
     /// </summary>
     public List<long> InitialReviewCategoryIds { get; set; } = new();
 }
 
 /// <summary>
-/// UpdateUserRequestDto 类。
+/// Update用户请求数据传输对象类。
 /// </summary>
 public class UpdateUserRequestDto
 {
     /// <summary>
-    /// FullName 属性。
+    /// 姓名属性。
     /// </summary>
     public string FullName { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentId 属性。
+    /// 部门ID属性。
     /// </summary>
     public long DepartmentId { get; set; }
     /// <summary>
-    /// IsEnabled 属性。
+    /// 是否启用属性。
     /// </summary>
     public bool IsEnabled { get; set; }
     /// <summary>
-    /// IsSuperAdmin 属性。
+    /// 是否超级管理员属性。
     /// </summary>
     public bool IsSuperAdmin { get; set; }
     /// <summary>
-    /// PreReviewDepartmentIds 属性。
+    /// 预审核部门Ids属性。
     /// </summary>
     public List<long> PreReviewDepartmentIds { get; set; } = new();
     /// <summary>
-    /// InitialReviewCategoryIds 属性。
+    /// 初审核类别Ids属性。
     /// </summary>
     public List<long> InitialReviewCategoryIds { get; set; } = new();
 }

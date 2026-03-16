@@ -10,11 +10,11 @@ namespace DeclarationManagement.Api.Repositories;
 public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
 {
     /// <summary>
-    /// _dbContext 字段。
+    /// 数据库上下文字段。
     /// </summary>
     private readonly AppDbContext _dbContext;
     /// <summary>
-    /// _dbSet 字段。
+    /// 数据库Set字段。
     /// </summary>
     private readonly DbSet<TEntity> _dbSet;
 
@@ -40,7 +40,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
     /// </summary>
     public async Task<List<TEntity>> GetListAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken cancellationToken = default)
     {
-        IQueryable<TEntity> query = _dbSet.AsQueryable();
+        IQueryable<TEntity> query = _dbSet.AsQueryable(); // query：query
 
         if (predicate != null)
         {

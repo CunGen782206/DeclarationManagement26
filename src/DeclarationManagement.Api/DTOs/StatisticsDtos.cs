@@ -3,86 +3,86 @@ using DeclarationManagement.Api.Entities;
 namespace DeclarationManagement.Api.DTOs;
 
 /// <summary>
-/// StatisticsQueryDto 类。
+/// 统计查询数据传输对象类。
 /// </summary>
 public class StatisticsQueryDto
 {
     /// <summary>
-    /// TaskId 属性。
+    /// 任务ID属性。
     /// </summary>
     public long? TaskId { get; set; }
     /// <summary>
-    /// StartDate 属性。
+    /// 开始日期属性。
     /// </summary>
     public DateTime? StartDate { get; set; }
     /// <summary>
-    /// EndDate 属性。
+    /// 结束日期属性。
     /// </summary>
     public DateTime? EndDate { get; set; }
     /// <summary>
-    /// DepartmentIds 属性。
+    /// 部门Ids属性。
     /// </summary>
     public List<long>? DepartmentIds { get; set; }
     /// <summary>
-    /// CategoryIds 属性。
+    /// 类别Ids属性。
     /// </summary>
     public List<long>? CategoryIds { get; set; }
     /// <summary>
-    /// Statuses 属性。
+    /// Statuses属性。
     /// </summary>
     public List<DeclarationStatus>? Statuses { get; set; }
 }
 
 /// <summary>
-/// StatisticsItemDto 类。
+/// 统计Item数据传输对象类。
 /// </summary>
 public class StatisticsItemDto
 {
     /// <summary>
-    /// DeclarationId 属性。
+    /// 申报ID属性。
     /// </summary>
     public long DeclarationId { get; set; }
     /// <summary>
-    /// ProjectName 属性。
+    /// 项目名称属性。
     /// </summary>
     public string ProjectName { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentName 属性。
+    /// 部门名称属性。
     /// </summary>
     public string DepartmentName { get; set; } = string.Empty;
     /// <summary>
-    /// ApplicantName 属性。
+    /// 申报人名称属性。
     /// </summary>
     public string ApplicantName { get; set; } = string.Empty;
     /// <summary>
-    /// ContactPhone 属性。
+    /// 联系方式电话属性。
     /// </summary>
     public string ContactPhone { get; set; } = string.Empty;
     /// <summary>
-    /// Status 属性。
+    /// 状态属性。
     /// </summary>
     public DeclarationStatus Status { get; set; }
     /// <summary>
-    /// SubmittedAt 属性。
+    /// 提交时间属性。
     /// </summary>
     public DateTime? SubmittedAt { get; set; }
 }
 
 /// <summary>
-/// ExportFileDto 类。
+/// 导出文件数据传输对象类。
 /// </summary>
 public class ExportFileDto
 {
     /// <summary>
-    /// FileName 属性。
+    /// 文件名称属性。
     /// </summary>
     public string FileName { get; set; } = string.Empty;
     /// <summary>
-    /// ContentType 属性。
+    /// 内容类型属性。
     /// </summary>
     public string ContentType { get; set; } = string.Empty;
     /// <summary>
-    /// Content 属性。
+    /// 内容属性。
     /// </summary>
     public byte[] Content { get; set; } = [];
 }

@@ -11,7 +11,7 @@ using System.IO.Compression;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// StatisticsService 类。
+/// 统计服务类。
 /// </summary>
 public class StatisticsService : IStatisticsService
 {
@@ -35,9 +35,9 @@ public class StatisticsService : IStatisticsService
     public async Task<List<StatisticsItemDto>> QueryAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
         // q：可继续叠加条件的查询对象
-        var q = BuildQuery(query);
+        var q = BuildQuery(query); // q：查询对象
         // data：数据库结果集
-        var data = await q.ToListAsync(cancellationToken);
+        var data = await q.ToListAsync(cancellationToken); // data：数据
         return data.Select(ToDto).ToList();
     }
 
@@ -47,18 +47,18 @@ public class StatisticsService : IStatisticsService
     public async Task<ExportFileDto> ExportExcelAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
         // data：待导出的申报数据
-        var data = await BuildQuery(query).ToListAsync(cancellationToken);
+        var data = await BuildQuery(query).ToListAsync(cancellationToken); // data：数据
 
         using var workbook = new XLWorkbook();
-        var ws = workbook.AddWorksheet("统计导出");
+        var ws = workbook.AddWorksheet("统计导出"); // ws：工作表
 
-        string[] headers = ["序号", "部门", "项目名称", "项目类别", "项目等级", "奖项级别", "参与形式", "负责人", "联系方式", "处理意见"];
+        string[] headers = ["序号", "部门", "项目名称", "项目类别", "项目等级", "奖项级别", "参与形式", "负责人", "联系方式", "处理意见"]; // headers：表头
         for (var i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
 
         for (var i = 0; i < data.Count; i++)
         {
-            var row = i + 2;
-            var d = data[i];
+            var row = i + 2; // row：行
+            var d = data[i]; // d：申报对象
             ws.Cell(row, 1).Value = i + 1;
             ws.Cell(row, 2).Value = d.Department?.Name ?? string.Empty;
             ws.Cell(row, 3).Value = d.ProjectName;
@@ -102,21 +102,21 @@ public class StatisticsService : IStatisticsService
             foreach (var d in data)
             {
                 // folder：每个表单归档目录（部门-负责人-项目名称）
-                var folder = Sanitize($"{d.Department?.Name}-{d.PrincipalName}-{d.ProjectName}");
-                var pdfPath = $"{folder}/{folder}.pdf";
-                var pdfEntry = archive.CreateEntry(pdfPath);
+                var folder = Sanitize($"{d.Department?.Name}-{d.PrincipalName}-{d.ProjectName}"); // folder：文件夹
+                var pdfPath = $"{folder}/{folder}.pdf"; // pdfPath：PDF路径
+                var pdfEntry = archive.CreateEntry(pdfPath); // pdfEntry：PDF条目
                 await using (var entryStream = pdfEntry.Open())
                 {
-                    var bytes = BuildDeclarationPdf(d);
+                    var bytes = BuildDeclarationPdf(d); // bytes：字节
                     await entryStream.WriteAsync(bytes, cancellationToken);
                 }
 
                 foreach (var a in d.Attachments.Where(x => !x.IsDeleted))
                 {
                     if (!File.Exists(a.StoragePath)) continue;
-                    var fileEntry = archive.CreateEntry($"{folder}/附件/{a.OriginalFileName}");
+                    var fileEntry = archive.CreateEntry($"{folder}/附件/{a.OriginalFileName}"); // fileEntry：文件条目
                     await using var entryStream = fileEntry.Open();
-                    var bytes = await File.ReadAllBytesAsync(a.StoragePath, cancellationToken);
+                    var bytes = await File.ReadAllBytesAsync(a.StoragePath, cancellationToken); // bytes：字节
                     await entryStream.WriteAsync(bytes, cancellationToken);
                 }
             }

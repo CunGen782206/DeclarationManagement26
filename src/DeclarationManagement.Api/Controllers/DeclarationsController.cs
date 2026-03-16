@@ -10,7 +10,7 @@ namespace DeclarationManagement.Api.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 /// <summary>
-/// DeclarationsController 类。
+/// DeclarationsController类。
 /// </summary>
 public class DeclarationsController : ControllerBase
 {
@@ -36,7 +36,7 @@ public class DeclarationsController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<DeclarationDetailDto>>> GetById(long id, CancellationToken cancellationToken)
     {
-        var result = await _declarationService.GetDetailAsync(id, User.GetUserId(), cancellationToken);
+        var result = await _declarationService.GetDetailAsync(id, User.GetUserId(), cancellationToken); // result：结果
 
         if (result == null)
         {
@@ -55,7 +55,7 @@ public class DeclarationsController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<long>>> Create([FromBody] SaveDeclarationRequestDto request, CancellationToken cancellationToken)
     {
-        var id = await _declarationService.CreateAsync(User.GetUserId(), request, cancellationToken);
+        var id = await _declarationService.CreateAsync(User.GetUserId(), request, cancellationToken); // id：ID
         return Ok(ApiResponse<long>.Ok(id, "创建成功"));
     }
 
@@ -107,7 +107,7 @@ public class DeclarationsController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<PagedResultDto<DeclarationListItemDto>>>> Mine([FromQuery] DeclarationPageQueryDto query, CancellationToken cancellationToken)
     {
-        var result = await _declarationService.GetMyDeclarationsAsync(User.GetUserId(), query, cancellationToken);
+        var result = await _declarationService.GetMyDeclarationsAsync(User.GetUserId(), query, cancellationToken); // result：结果
         return Ok(ApiResponse<PagedResultDto<DeclarationListItemDto>>.Ok(result));
     }
 
@@ -121,7 +121,7 @@ public class DeclarationsController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<long>>> Upload(long id, IFormFile file, CancellationToken cancellationToken)
     {
-        var attachmentId = await _declarationService.UploadAttachmentAsync(id, User.GetUserId(), file, cancellationToken);
+        var attachmentId = await _declarationService.UploadAttachmentAsync(id, User.GetUserId(), file, cancellationToken); // attachmentId：附件ID
         return Ok(ApiResponse<long>.Ok(attachmentId, "上传成功"));
     }
 
@@ -134,7 +134,7 @@ public class DeclarationsController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<List<AttachmentDto>>>> GetAttachments(long id, CancellationToken cancellationToken)
     {
-        var result = await _declarationService.GetAttachmentsAsync(id, User.GetUserId(), cancellationToken);
+        var result = await _declarationService.GetAttachmentsAsync(id, User.GetUserId(), cancellationToken); // result：结果
         return Ok(ApiResponse<List<AttachmentDto>>.Ok(result));
     }
 
@@ -147,7 +147,7 @@ public class DeclarationsController : ControllerBase
     /// </summary>
     public async Task<IActionResult> DownloadAttachment(long attachmentId, CancellationToken cancellationToken)
     {
-        var file = await _declarationService.DownloadAttachmentAsync(attachmentId, User.GetUserId(), cancellationToken);
+        var file = await _declarationService.DownloadAttachmentAsync(attachmentId, User.GetUserId(), cancellationToken); // file：文件
         return File(file.Content, file.ContentType, file.FileName);
     }
 }

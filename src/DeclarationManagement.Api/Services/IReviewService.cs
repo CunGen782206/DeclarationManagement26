@@ -3,7 +3,7 @@ using DeclarationManagement.Api.DTOs;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// IReviewService 接口。
+/// IReview服务接口。
 /// </summary>
 public interface IReviewService
 {

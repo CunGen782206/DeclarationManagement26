@@ -10,12 +10,12 @@ namespace DeclarationManagement.Api.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 /// <summary>
-/// ReviewsController 类。
+/// ReviewsController类。
 /// </summary>
 public class ReviewsController : ControllerBase
 {
     /// <summary>
-    /// _reviewService 字段。
+    /// 审核服务字段。
     /// </summary>
     private readonly IReviewService _reviewService;
 
@@ -33,7 +33,7 @@ public class ReviewsController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<PagedResultDto<PendingReviewItemDto>>>> GetPending([FromQuery] PendingReviewQueryDto query, CancellationToken cancellationToken)
     {
-        var result = await _reviewService.GetPendingAsync(User.GetUserId(), query, cancellationToken);
+        var result = await _reviewService.GetPendingAsync(User.GetUserId(), query, cancellationToken); // result：结果
         return Ok(ApiResponse<PagedResultDto<PendingReviewItemDto>>.Ok(result));
     }
 
@@ -53,7 +53,7 @@ public class ReviewsController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<List<ReviewRecordDto>>>> Records(long declarationId, CancellationToken cancellationToken)
     {
-        var result = await _reviewService.GetReviewRecordsAsync(declarationId, User.GetUserId(), cancellationToken);
+        var result = await _reviewService.GetReviewRecordsAsync(declarationId, User.GetUserId(), cancellationToken); // result：结果
         return Ok(ApiResponse<List<ReviewRecordDto>>.Ok(result));
     }
 }

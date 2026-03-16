@@ -3,12 +3,12 @@ using Microsoft.Extensions.Options;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// FileStorageService 类。
+/// 文件存储服务类。
 /// </summary>
 public class FileStorageService : IFileStorageService
 {
     /// <summary>
-    /// _options 字段。
+    /// 配置字段。
     /// </summary>
     private readonly FileStorageOptions _options;
 
@@ -26,11 +26,11 @@ public class FileStorageService : IFileStorageService
     public async Task<(string StorageFileName, string StoragePath, long Size)> SaveAsync(IFormFile file, string subFolder, CancellationToken cancellationToken = default)
     {
         Directory.CreateDirectory(_options.RootPath);
-        var targetFolder = Path.Combine(_options.RootPath, subFolder);
+        var targetFolder = Path.Combine(_options.RootPath, subFolder); // targetFolder：target文件夹
         Directory.CreateDirectory(targetFolder);
 
-        var storageFileName = $"{Guid.NewGuid():N}{Path.GetExtension(file.FileName)}";
-        var fullPath = Path.Combine(targetFolder, storageFileName);
+        var storageFileName = $"{Guid.NewGuid():N}{Path.GetExtension(file.FileName)}"; // storageFileName：存储文件名称
+        var fullPath = Path.Combine(targetFolder, storageFileName); // fullPath：完整路径
 
         await using var stream = new FileStream(fullPath, FileMode.CreateNew);
         await file.CopyToAsync(stream, cancellationToken);

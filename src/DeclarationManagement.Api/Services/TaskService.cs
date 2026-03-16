@@ -6,12 +6,12 @@ using Microsoft.EntityFrameworkCore;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// TaskService 类。
+/// 任务服务类。
 /// </summary>
 public class TaskService : ITaskService
 {
     /// <summary>
-    /// _dbContext 字段。
+    /// 数据库上下文字段。
     /// </summary>
     private readonly AppDbContext _dbContext;
 

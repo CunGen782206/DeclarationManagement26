@@ -6,36 +6,36 @@ namespace DeclarationManagement.Api.Entities;
 public class DeclarationTask : BaseEntity
 {
     /// <summary>
-    /// TaskName 属性。
+    /// 任务名称属性。
     /// </summary>
     public string TaskName { get; set; } = string.Empty;
     /// <summary>
-    /// StartAt 属性。
+    /// 开始时间属性。
     /// </summary>
     public DateTime StartAt { get; set; }
     /// <summary>
-    /// EndAt 属性。
+    /// 结束时间属性。
     /// </summary>
     public DateTime EndAt { get; set; }
     /// <summary>
-    /// IsEnabled 属性。
+    /// 是否启用属性。
     /// </summary>
     public bool IsEnabled { get; set; } = true;
     /// <summary>
-    /// CreatedByUserId 属性。
+    /// 创建时间By用户ID属性。
     /// </summary>
     public long CreatedByUserId { get; set; }
     /// <summary>
-    /// UpdatedAt 属性。
+    /// 更新时间时间属性。
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
 
     /// <summary>
-    /// CreatedByUser 属性。
+    /// 创建时间By用户属性。
     /// </summary>
     public User? CreatedByUser { get; set; }
     /// <summary>
-    /// Declarations 属性。
+    /// Declarations属性。
     /// </summary>
     public ICollection<Declaration> Declarations { get; set; } = new List<Declaration>();
 }

@@ -10,16 +10,16 @@ using System.Text;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// AuthService 类。
+/// Auth服务类。
 /// </summary>
 public class AuthService : IAuthService
 {
     /// <summary>
-    /// _dbContext 字段。
+    /// 数据库上下文字段。
     /// </summary>
     private readonly AppDbContext _dbContext;
     /// <summary>
-    /// _jwtOptions 字段。
+    /// jwt配置字段。
     /// </summary>
     private readonly JwtOptions _jwtOptions;
 
@@ -48,9 +48,9 @@ public class AuthService : IAuthService
         user.LastLoginAt = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var expiresAt = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpireMinutes);
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var expiresAt = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpireMinutes); // expiresAt：过期时间
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)); // key：key
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); // creds：creds
 
         var claims = new List<Claim>
         {

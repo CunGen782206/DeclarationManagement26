@@ -6,28 +6,28 @@ namespace DeclarationManagement.Api.Entities;
 public class Department : BaseEntity
 {
     /// <summary>
-    /// Name 属性。
+    /// 名称属性。
     /// </summary>
     public string Name { get; set; } = string.Empty;
     /// <summary>
-    /// SortOrder 属性。
+    /// SortOrder属性。
     /// </summary>
     public int SortOrder { get; set; }
     /// <summary>
-    /// IsEnabled 属性。
+    /// 是否启用属性。
     /// </summary>
     public bool IsEnabled { get; set; } = true;
 
     /// <summary>
-    /// Users 属性。
+    /// 用户属性。
     /// </summary>
     public ICollection<User> Users { get; set; } = new List<User>();
     /// <summary>
-    /// Declarations 属性。
+    /// Declarations属性。
     /// </summary>
     public ICollection<Declaration> Declarations { get; set; } = new List<Declaration>();
     /// <summary>
-    /// UserPreReviewDepartments 属性。
+    /// 用户预审核Departments属性。
     /// </summary>
     public ICollection<UserPreReviewDepartment> UserPreReviewDepartments { get; set; } = new List<UserPreReviewDepartment>();
 }

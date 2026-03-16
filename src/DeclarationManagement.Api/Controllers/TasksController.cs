@@ -10,12 +10,12 @@ namespace DeclarationManagement.Api.Controllers;
 [Route("api/[controller]")]
 [Authorize]
 /// <summary>
-/// TasksController 类。
+/// TasksController类。
 /// </summary>
 public class TasksController : ControllerBase
 {
     /// <summary>
-    /// _taskService 字段。
+    /// 任务服务字段。
     /// </summary>
     private readonly ITaskService _taskService;
 
@@ -33,7 +33,7 @@ public class TasksController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<List<TaskDto>>>> GetList(CancellationToken cancellationToken)
     {
-        var result = await _taskService.GetListAsync(cancellationToken);
+        var result = await _taskService.GetListAsync(cancellationToken); // result：结果
         return Ok(ApiResponse<List<TaskDto>>.Ok(result));
     }
 
@@ -43,7 +43,7 @@ public class TasksController : ControllerBase
     /// </summary>
     public async Task<ActionResult<ApiResponse<long>>> Create([FromBody] CreateTaskRequestDto request, CancellationToken cancellationToken)
     {
-        var id = await _taskService.CreateAsync(User.GetUserId(), request, cancellationToken);
+        var id = await _taskService.CreateAsync(User.GetUserId(), request, cancellationToken); // id：ID
         return Ok(ApiResponse<long>.Ok(id, "创建成功"));
     }
 

@@ -1,7 +1,7 @@
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// IFileStorageService 接口。
+/// IFile存储服务接口。
 /// </summary>
 public interface IFileStorageService
 {

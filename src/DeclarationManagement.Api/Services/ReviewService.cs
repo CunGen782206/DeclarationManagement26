@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// ReviewService 类。
+/// 审核服务类。
 /// </summary>
 public class ReviewService : IReviewService
 {
@@ -59,7 +59,7 @@ public class ReviewService : IReviewService
         }
 
         // total：待审总数
-        var total = await q.LongCountAsync(cancellationToken);
+        var total = await q.LongCountAsync(cancellationToken); // total：总数
         // list：当前页待审数据
         var list = await q.OrderByDescending(x => x.SubmittedAt)
             .Skip((query.PageIndex - 1) * query.PageSize)
@@ -98,17 +98,17 @@ public class ReviewService : IReviewService
 
         if (request.ReviewStage == ReviewStage.PreReview)
         {
-            var can = await _dbContext.UserPreReviewDepartments.AnyAsync(x => x.UserId == reviewerUserId && x.DepartmentId == declaration.DepartmentId, cancellationToken);
+            var can = await _dbContext.UserPreReviewDepartments.AnyAsync(x => x.UserId == reviewerUserId && x.DepartmentId == declaration.DepartmentId, cancellationToken); // can：是否允许
             if (!can) throw new InvalidOperationException("无部门预审权限");
         }
         else
         {
-            var can = await _dbContext.UserInitialReviewCategories.AnyAsync(x => x.UserId == reviewerUserId && x.ProjectCategoryId == declaration.ProjectCategoryId, cancellationToken);
+            var can = await _dbContext.UserInitialReviewCategories.AnyAsync(x => x.UserId == reviewerUserId && x.ProjectCategoryId == declaration.ProjectCategoryId, cancellationToken); // can：是否允许
             if (!can) throw new InvalidOperationException("无初审权限");
         }
 
         // fromStatus：记录审核前状态，便于流程追踪
-        var fromStatus = declaration.CurrentStatus;
+        var fromStatus = declaration.CurrentStatus; // fromStatus：来源状态
         declaration.CurrentStatus = MapToStatus(request.ReviewStage, request.ReviewAction);
         declaration.CurrentNode = declaration.CurrentStatus switch
         {

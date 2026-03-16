@@ -3,281 +3,281 @@ using DeclarationManagement.Api.Entities;
 namespace DeclarationManagement.Api.DTOs;
 
 /// <summary>
-/// SaveDeclarationRequestDto 类。
+/// Save申报请求数据传输对象类。
 /// </summary>
 public class SaveDeclarationRequestDto
 {
     /// <summary>
-    /// TaskId 属性。
+    /// 任务ID属性。
     /// </summary>
     public long TaskId { get; set; }
     /// <summary>
-    /// PrincipalName 属性。
+    /// 主体名称属性。
     /// </summary>
     public string PrincipalName { get; set; } = string.Empty;
     /// <summary>
-    /// ContactPhone 属性。
+    /// 联系方式电话属性。
     /// </summary>
     public string ContactPhone { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentId 属性。
+    /// 部门ID属性。
     /// </summary>
     public long DepartmentId { get; set; }
     /// <summary>
-    /// ProjectName 属性。
+    /// 项目名称属性。
     /// </summary>
     public string ProjectName { get; set; } = string.Empty;
     /// <summary>
-    /// ProjectCategoryId 属性。
+    /// 项目类别ID属性。
     /// </summary>
     public long ProjectCategoryId { get; set; }
     /// <summary>
-    /// ProjectLevel 属性。
+    /// 项目等级属性。
     /// </summary>
     public ProjectLevel ProjectLevel { get; set; }
     /// <summary>
-    /// AwardLevel 属性。
+    /// 奖项等级属性。
     /// </summary>
     public AwardLevel AwardLevel { get; set; }
     /// <summary>
-    /// ParticipationType 属性。
+    /// 参与类型属性。
     /// </summary>
     public ParticipationType ParticipationType { get; set; }
     /// <summary>
-    /// ApprovalDocumentName 属性。
+    /// 认定批文文档名称属性。
     /// </summary>
     public string? ApprovalDocumentName { get; set; }
     /// <summary>
-    /// SealUnitAndDate 属性。
+    /// 盖章单位And日期属性。
     /// </summary>
     public string? SealUnitAndDate { get; set; }
     /// <summary>
-    /// ProjectContent 属性。
+    /// 项目内容属性。
     /// </summary>
     public string? ProjectContent { get; set; }
     /// <summary>
-    /// ProjectAchievement 属性。
+    /// 项目成果属性。
     /// </summary>
     public string? ProjectAchievement { get; set; }
 }
 
 /// <summary>
-/// DeclarationSubmitRequestDto 类。
+/// 申报Submit请求数据传输对象类。
 /// </summary>
 public class DeclarationSubmitRequestDto
 {
     /// <summary>
-    /// DeclarationId 属性。
+    /// 申报ID属性。
     /// </summary>
     public long DeclarationId { get; set; }
 }
 
 /// <summary>
-/// DeclarationResubmitRequestDto 类。
+/// 申报Resubmit请求数据传输对象类。
 /// </summary>
 public class DeclarationResubmitRequestDto
 {
     /// <summary>
-    /// DeclarationId 属性。
+    /// 申报ID属性。
     /// </summary>
     public long DeclarationId { get; set; }
 }
 
 /// <summary>
-/// DeclarationDetailDto 类。
+/// 申报Detail数据传输对象类。
 /// </summary>
 public class DeclarationDetailDto
 {
     /// <summary>
-    /// Id 属性。
+    /// ID属性。
     /// </summary>
     public long Id { get; set; }
     /// <summary>
-    /// TaskId 属性。
+    /// 任务ID属性。
     /// </summary>
     public long TaskId { get; set; }
     /// <summary>
-    /// TaskName 属性。
+    /// 任务名称属性。
     /// </summary>
     public string TaskName { get; set; } = string.Empty;
     /// <summary>
-    /// ApplicantName 属性。
+    /// 申报人名称属性。
     /// </summary>
     public string ApplicantName { get; set; } = string.Empty;
     /// <summary>
-    /// PrincipalName 属性。
+    /// 主体名称属性。
     /// </summary>
     public string PrincipalName { get; set; } = string.Empty;
     /// <summary>
-    /// ContactPhone 属性。
+    /// 联系方式电话属性。
     /// </summary>
     public string ContactPhone { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentId 属性。
+    /// 部门ID属性。
     /// </summary>
     public long DepartmentId { get; set; }
     /// <summary>
-    /// DepartmentName 属性。
+    /// 部门名称属性。
     /// </summary>
     public string DepartmentName { get; set; } = string.Empty;
     /// <summary>
-    /// ProjectCategoryId 属性。
+    /// 项目类别ID属性。
     /// </summary>
     public long ProjectCategoryId { get; set; }
     /// <summary>
-    /// ProjectCategoryName 属性。
+    /// 项目类别名称属性。
     /// </summary>
     public string ProjectCategoryName { get; set; } = string.Empty;
     /// <summary>
-    /// ProjectName 属性。
+    /// 项目名称属性。
     /// </summary>
     public string ProjectName { get; set; } = string.Empty;
     /// <summary>
-    /// ProjectLevel 属性。
+    /// 项目等级属性。
     /// </summary>
     public ProjectLevel ProjectLevel { get; set; }
     /// <summary>
-    /// AwardLevel 属性。
+    /// 奖项等级属性。
     /// </summary>
     public AwardLevel AwardLevel { get; set; }
     /// <summary>
-    /// ParticipationType 属性。
+    /// 参与类型属性。
     /// </summary>
     public ParticipationType ParticipationType { get; set; }
     /// <summary>
-    /// CurrentStatus 属性。
+    /// 当前状态属性。
     /// </summary>
     public DeclarationStatus CurrentStatus { get; set; }
     /// <summary>
-    /// CurrentNode 属性。
+    /// 当前节点属性。
     /// </summary>
     public DeclarationNode CurrentNode { get; set; }
     /// <summary>
-    /// VersionNo 属性。
+    /// 版本No属性。
     /// </summary>
     public int VersionNo { get; set; }
     /// <summary>
-    /// SubmittedAt 属性。
+    /// 提交时间属性。
     /// </summary>
     public DateTime? SubmittedAt { get; set; }
 }
 
 /// <summary>
-/// DeclarationPageQueryDto 类。
+/// 申报分页查询数据传输对象类。
 /// </summary>
 public class DeclarationPageQueryDto
 {
     /// <summary>
-    /// PageIndex 属性。
+    /// 分页页码属性。
     /// </summary>
     public int PageIndex { get; set; } = 1;
     /// <summary>
-    /// PageSize 属性。
+    /// 分页大小属性。
     /// </summary>
     public int PageSize { get; set; } = 10;
     /// <summary>
-    /// StartDate 属性。
+    /// 开始日期属性。
     /// </summary>
     public DateTime? StartDate { get; set; }
     /// <summary>
-    /// EndDate 属性。
+    /// 结束日期属性。
     /// </summary>
     public DateTime? EndDate { get; set; }
     /// <summary>
-    /// DepartmentIds 属性。
+    /// 部门Ids属性。
     /// </summary>
     public List<long>? DepartmentIds { get; set; }
     /// <summary>
-    /// CategoryIds 属性。
+    /// 类别Ids属性。
     /// </summary>
     public List<long>? CategoryIds { get; set; }
     /// <summary>
-    /// Statuses 属性。
+    /// Statuses属性。
     /// </summary>
     public List<DeclarationStatus>? Statuses { get; set; }
 }
 
 /// <summary>
-/// DeclarationListItemDto 类。
+/// 申报列表Item数据传输对象类。
 /// </summary>
 public class DeclarationListItemDto
 {
     /// <summary>
-    /// Id 属性。
+    /// ID属性。
     /// </summary>
     public long Id { get; set; }
     /// <summary>
-    /// ProjectName 属性。
+    /// 项目名称属性。
     /// </summary>
     public string ProjectName { get; set; } = string.Empty;
     /// <summary>
-    /// ProjectCategoryName 属性。
+    /// 项目类别名称属性。
     /// </summary>
     public string ProjectCategoryName { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentName 属性。
+    /// 部门名称属性。
     /// </summary>
     public string DepartmentName { get; set; } = string.Empty;
     /// <summary>
-    /// PrincipalName 属性。
+    /// 主体名称属性。
     /// </summary>
     public string PrincipalName { get; set; } = string.Empty;
     /// <summary>
-    /// CurrentStatus 属性。
+    /// 当前状态属性。
     /// </summary>
     public DeclarationStatus CurrentStatus { get; set; }
     /// <summary>
-    /// SubmittedAt 属性。
+    /// 提交时间属性。
     /// </summary>
     public DateTime? SubmittedAt { get; set; }
     /// <summary>
-    /// Action 属性。
+    /// 动作属性。
     /// </summary>
     public string Action { get; set; } = string.Empty;
 }
 
 /// <summary>
-/// AttachmentDto 类。
+/// 附件数据传输对象类。
 /// </summary>
 public class AttachmentDto
 {
     /// <summary>
-    /// Id 属性。
+    /// ID属性。
     /// </summary>
     public long Id { get; set; }
     /// <summary>
-    /// OriginalFileName 属性。
+    /// 原始文件名称属性。
     /// </summary>
     public string OriginalFileName { get; set; } = string.Empty;
     /// <summary>
-    /// FileSizeBytes 属性。
+    /// 文件大小字节属性。
     /// </summary>
     public long FileSizeBytes { get; set; }
     /// <summary>
-    /// UploadedAt 属性。
+    /// Uploaded时间属性。
     /// </summary>
     public DateTime UploadedAt { get; set; }
 }
 
 /// <summary>
-/// PagedResultDto 类。
+/// Paged结果数据传输对象类。
 /// </summary>
 public class PagedResultDto<T>
 {
     /// <summary>
-    /// PageIndex 属性。
+    /// 分页页码属性。
     /// </summary>
     public int PageIndex { get; set; }
     /// <summary>
-    /// PageSize 属性。
+    /// 分页大小属性。
     /// </summary>
     public int PageSize { get; set; }
     /// <summary>
-    /// TotalCount 属性。
+    /// 总数Count属性。
     /// </summary>
     public long TotalCount { get; set; }
     /// <summary>
-    /// Items 属性。
+    /// 项属性。
     /// </summary>
     public List<T> Items { get; set; } = new();
 }

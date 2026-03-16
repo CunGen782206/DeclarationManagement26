@@ -3,7 +3,7 @@ using DeclarationManagement.Api.DTOs;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// IStatisticsService 接口。
+/// IStatistics服务接口。
 /// </summary>
 public interface IStatisticsService
 {

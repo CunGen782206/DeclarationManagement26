@@ -3,7 +3,7 @@ using DeclarationManagement.Api.DTOs;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// ITaskService 接口。
+/// ITask服务接口。
 /// </summary>
 public interface ITaskService
 {

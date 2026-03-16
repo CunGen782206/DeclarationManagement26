@@ -6,15 +6,15 @@ namespace DeclarationManagement.Api.DTOs;
 public class ApiResponse<T>
 {
     /// <summary>
-    /// Success 属性。
+    /// Success属性。
     /// </summary>
     public bool Success { get; set; }
     /// <summary>
-    /// Message 属性。
+    /// Message属性。
     /// </summary>
     public string Message { get; set; } = string.Empty;
     /// <summary>
-    /// Data 属性。
+    /// 数据属性。
     /// </summary>
     public T? Data { get; set; }
 

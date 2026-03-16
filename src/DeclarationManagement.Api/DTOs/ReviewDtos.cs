@@ -3,141 +3,141 @@ using DeclarationManagement.Api.Entities;
 namespace DeclarationManagement.Api.DTOs;
 
 /// <summary>
-/// ReviewActionRequestDto 类。
+/// 审核动作请求数据传输对象类。
 /// </summary>
 public class ReviewActionRequestDto
 {
     /// <summary>
-    /// DeclarationId 属性。
+    /// 申报ID属性。
     /// </summary>
     public long DeclarationId { get; set; }
     /// <summary>
-    /// ReviewStage 属性。
+    /// 审核Stage属性。
     /// </summary>
     public ReviewStage ReviewStage { get; set; }
     /// <summary>
-    /// ReviewAction 属性。
+    /// 审核动作属性。
     /// </summary>
     public ReviewAction ReviewAction { get; set; }
     /// <summary>
-    /// Reason 属性。
+    /// 原因属性。
     /// </summary>
     public string? Reason { get; set; }
     /// <summary>
-    /// RecognizedProjectLevel 属性。
+    /// 认定项目等级属性。
     /// </summary>
     public ProjectLevel? RecognizedProjectLevel { get; set; }
     /// <summary>
-    /// RecognizedAwardLevel 属性。
+    /// 认定奖项等级属性。
     /// </summary>
     public AwardLevel? RecognizedAwardLevel { get; set; }
     /// <summary>
-    /// RecognizedAmount 属性。
+    /// 认定金额属性。
     /// </summary>
     public decimal? RecognizedAmount { get; set; }
     /// <summary>
-    /// Remark 属性。
+    /// 备注属性。
     /// </summary>
     public string? Remark { get; set; }
 }
 
 /// <summary>
-/// ReviewRecordDto 类。
+/// 审核记录数据传输对象类。
 /// </summary>
 public class ReviewRecordDto
 {
     /// <summary>
-    /// Id 属性。
+    /// ID属性。
     /// </summary>
     public long Id { get; set; }
     /// <summary>
-    /// DeclarationId 属性。
+    /// 申报ID属性。
     /// </summary>
     public long DeclarationId { get; set; }
     /// <summary>
-    /// ReviewStage 属性。
+    /// 审核Stage属性。
     /// </summary>
     public ReviewStage ReviewStage { get; set; }
     /// <summary>
-    /// ReviewAction 属性。
+    /// 审核动作属性。
     /// </summary>
     public ReviewAction ReviewAction { get; set; }
     /// <summary>
-    /// Reason 属性。
+    /// 原因属性。
     /// </summary>
     public string? Reason { get; set; }
     /// <summary>
-    /// RecognizedProjectLevel 属性。
+    /// 认定项目等级属性。
     /// </summary>
     public ProjectLevel? RecognizedProjectLevel { get; set; }
     /// <summary>
-    /// RecognizedAwardLevel 属性。
+    /// 认定奖项等级属性。
     /// </summary>
     public AwardLevel? RecognizedAwardLevel { get; set; }
     /// <summary>
-    /// RecognizedAmount 属性。
+    /// 认定金额属性。
     /// </summary>
     public decimal? RecognizedAmount { get; set; }
     /// <summary>
-    /// Remark 属性。
+    /// 备注属性。
     /// </summary>
     public string? Remark { get; set; }
     /// <summary>
-    /// ReviewedByUserId 属性。
+    /// ReviewedBy用户ID属性。
     /// </summary>
     public long ReviewedByUserId { get; set; }
     /// <summary>
-    /// ReviewedAt 属性。
+    /// Reviewed时间属性。
     /// </summary>
     public DateTime ReviewedAt { get; set; }
 }
 
 /// <summary>
-/// PendingReviewQueryDto 类。
+/// 待处理审核查询数据传输对象类。
 /// </summary>
 public class PendingReviewQueryDto
 {
     /// <summary>
-    /// PageIndex 属性。
+    /// 分页页码属性。
     /// </summary>
     public int PageIndex { get; set; } = 1;
     /// <summary>
-    /// PageSize 属性。
+    /// 分页大小属性。
     /// </summary>
     public int PageSize { get; set; } = 10;
     /// <summary>
-    /// StartDate 属性。
+    /// 开始日期属性。
     /// </summary>
     public DateTime? StartDate { get; set; }
     /// <summary>
-    /// EndDate 属性。
+    /// 结束日期属性。
     /// </summary>
     public DateTime? EndDate { get; set; }
 }
 
 /// <summary>
-/// PendingReviewItemDto 类。
+/// 待处理审核Item数据传输对象类。
 /// </summary>
 public class PendingReviewItemDto
 {
     /// <summary>
-    /// DeclarationId 属性。
+    /// 申报ID属性。
     /// </summary>
     public long DeclarationId { get; set; }
     /// <summary>
-    /// ProjectName 属性。
+    /// 项目名称属性。
     /// </summary>
     public string ProjectName { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentName 属性。
+    /// 部门名称属性。
     /// </summary>
     public string DepartmentName { get; set; } = string.Empty;
     /// <summary>
-    /// CurrentReviewStage 属性。
+    /// 当前审核Stage属性。
     /// </summary>
     public ReviewStage CurrentReviewStage { get; set; }
     /// <summary>
-    /// SubmittedAt 属性。
+    /// 提交时间属性。
     /// </summary>
     public DateTime? SubmittedAt { get; set; }
 }

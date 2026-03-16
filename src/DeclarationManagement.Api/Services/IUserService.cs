@@ -3,7 +3,7 @@ using DeclarationManagement.Api.DTOs;
 namespace DeclarationManagement.Api.Services;
 
 /// <summary>
-/// IUserService 接口。
+/// IUser服务接口。
 /// </summary>
 public interface IUserService
 {

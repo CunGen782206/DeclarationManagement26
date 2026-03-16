@@ -6,36 +6,36 @@ namespace DeclarationManagement.Api.Entities;
 public class DeclarationFlowLog : BaseEntity
 {
     /// <summary>
-    /// DeclarationId 属性。
+    /// 申报ID属性。
     /// </summary>
     public long DeclarationId { get; set; }
     /// <summary>
-    /// FromStatus 属性。
+    /// 来源状态属性。
     /// </summary>
     public DeclarationStatus? FromStatus { get; set; }
     /// <summary>
-    /// ToStatus 属性。
+    /// 目标状态属性。
     /// </summary>
     public DeclarationStatus ToStatus { get; set; }
     /// <summary>
-    /// ActionType 属性。
+    /// 动作类型属性。
     /// </summary>
     public FlowActionType ActionType { get; set; }
     /// <summary>
-    /// OperatorUserId 属性。
+    /// 操作人用户ID属性。
     /// </summary>
     public long OperatorUserId { get; set; }
     /// <summary>
-    /// Note 属性。
+    /// Note属性。
     /// </summary>
     public string? Note { get; set; }
 
     /// <summary>
-    /// Declaration 属性。
+    /// 申报属性。
     /// </summary>
     public Declaration? Declaration { get; set; }
     /// <summary>
-    /// OperatorUser 属性。
+    /// 操作人用户属性。
     /// </summary>
     public User? OperatorUser { get; set; }
 }

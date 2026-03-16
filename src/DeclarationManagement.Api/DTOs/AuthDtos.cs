@@ -1,73 +1,73 @@
 namespace DeclarationManagement.Api.DTOs;
 
 /// <summary>
-/// LoginRequestDto 类。
+/// 登录请求数据传输对象类。
 /// </summary>
 public class LoginRequestDto
 {
     /// <summary>
-    /// JobNumber 属性。
+    /// 工号编号属性。
     /// </summary>
     public string JobNumber { get; set; } = string.Empty;
     /// <summary>
-    /// Password 属性。
+    /// 密码属性。
     /// </summary>
     public string Password { get; set; } = string.Empty;
 }
 
 /// <summary>
-/// LoginResponseDto 类。
+/// 登录响应数据传输对象类。
 /// </summary>
 public class LoginResponseDto
 {
     /// <summary>
-    /// AccessToken 属性。
+    /// 访问令牌属性。
     /// </summary>
     public string AccessToken { get; set; } = string.Empty;
     /// <summary>
-    /// ExpiresAt 属性。
+    /// 过期时间属性。
     /// </summary>
     public DateTime ExpiresAt { get; set; }
 }
 
 /// <summary>
-/// CurrentUserDto 类。
+/// 当前用户数据传输对象类。
 /// </summary>
 public class CurrentUserDto
 {
     /// <summary>
-    /// UserId 属性。
+    /// 用户ID属性。
     /// </summary>
     public long UserId { get; set; }
     /// <summary>
-    /// JobNumber 属性。
+    /// 工号编号属性。
     /// </summary>
     public string JobNumber { get; set; } = string.Empty;
     /// <summary>
-    /// FullName 属性。
+    /// 姓名属性。
     /// </summary>
     public string FullName { get; set; } = string.Empty;
     /// <summary>
-    /// DepartmentId 属性。
+    /// 部门ID属性。
     /// </summary>
     public long DepartmentId { get; set; }
     /// <summary>
-    /// IsSuperAdmin 属性。
+    /// 是否超级管理员属性。
     /// </summary>
     public bool IsSuperAdmin { get; set; }
 }
 
 /// <summary>
-/// ChangePasswordRequestDto 类。
+/// Change密码请求数据传输对象类。
 /// </summary>
 public class ChangePasswordRequestDto
 {
     /// <summary>
-    /// OldPassword 属性。
+    /// 旧密码属性。
     /// </summary>
     public string OldPassword { get; set; } = string.Empty;
     /// <summary>
-    /// NewPassword 属性。
+    /// 新密码属性。
     /// </summary>
     public string NewPassword { get; set; } = string.Empty;
 }
