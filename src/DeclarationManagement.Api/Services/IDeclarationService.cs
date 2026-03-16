@@ -2,6 +2,9 @@ using DeclarationManagement.Api.DTOs;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// IDeclarationService 接口。
+/// </summary>
 public interface IDeclarationService
 {
     Task<DeclarationDetailDto?> GetDetailAsync(long declarationId, long currentUserId, CancellationToken cancellationToken = default);

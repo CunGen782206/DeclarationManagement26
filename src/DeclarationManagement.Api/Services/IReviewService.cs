@@ -2,6 +2,9 @@ using DeclarationManagement.Api.DTOs;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// IReviewService 接口。
+/// </summary>
 public interface IReviewService
 {
     Task<PagedResultDto<PendingReviewItemDto>> GetPendingAsync(long reviewerUserId, PendingReviewQueryDto query, CancellationToken cancellationToken = default);
