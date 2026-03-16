@@ -52,10 +52,17 @@ builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build(); // app：app
 
-if (app.Environment.IsDevelopment())
+var enableSwagger = app.Environment.IsDevelopment() || app.Configuration.GetValue<bool>("Swagger:Enable"); // enableSwagger：是否启用Swagger
+var swaggerRoutePrefix = app.Configuration.GetValue<string>("Swagger:RoutePrefix") ?? "swagger"; // swaggerRoutePrefix：Swagger路由前缀
+
+if (enableSwagger)
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options =>
+    {
+        options.SwaggerEndpoint("/swagger/v1/swagger.json", "DeclarationManagement.Api v1");
+        options.RoutePrefix = swaggerRoutePrefix;
+    });
 }
 
 app.UseHttpsRedirection();
