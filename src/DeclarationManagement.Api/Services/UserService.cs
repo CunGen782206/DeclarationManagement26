@@ -5,15 +5,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// 用户服务类。
+/// </summary>
 public class UserService : IUserService
 {
+    /// <summary>
+    /// 数据库上下文字段。
+    /// </summary>
     private readonly AppDbContext _dbContext;
 
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public UserService(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     public async Task<List<UserDto>> GetListAsync(CancellationToken cancellationToken = default)
     {
         var users = await _dbContext.Users
@@ -37,9 +49,12 @@ public class UserService : IUserService
         }).ToList();
     }
 
+    /// <summary>
+    /// 创建数据。
+    /// </summary>
     public async Task<long> CreateAsync(CreateUserRequestDto request, CancellationToken cancellationToken = default)
     {
-        var existed = await _dbContext.Users.AnyAsync(x => x.JobNumber == request.JobNumber, cancellationToken);
+        var existed = await _dbContext.Users.AnyAsync(x => x.JobNumber == request.JobNumber, cancellationToken); // existed：existed
         if (existed)
         {
             throw new InvalidOperationException("工号已存在");
@@ -65,6 +80,9 @@ public class UserService : IUserService
         return user.Id;
     }
 
+    /// <summary>
+    /// 更新数据。
+    /// </summary>
     public async Task UpdateAsync(long userId, UpdateUserRequestDto request, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
@@ -80,6 +98,9 @@ public class UserService : IUserService
         await ReplacePermissionsAsync(user.Id, request.PreReviewDepartmentIds, request.InitialReviewCategoryIds, cancellationToken);
     }
 
+    /// <summary>
+    /// 删除数据。
+    /// </summary>
     public async Task DeleteAsync(long userId, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
@@ -89,6 +110,9 @@ public class UserService : IUserService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// 重置数据。
+    /// </summary>
     public async Task ResetPasswordAsync(long userId, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
@@ -101,12 +125,15 @@ public class UserService : IUserService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// 替换处理。
+    /// </summary>
     private async Task ReplacePermissionsAsync(long userId, List<long> preReviewDepartmentIds, List<long> initialReviewCategoryIds, CancellationToken cancellationToken)
     {
-        var preRecords = await _dbContext.UserPreReviewDepartments.Where(x => x.UserId == userId).ToListAsync(cancellationToken);
+        var preRecords = await _dbContext.UserPreReviewDepartments.Where(x => x.UserId == userId).ToListAsync(cancellationToken); // preRecords：预Records
         _dbContext.UserPreReviewDepartments.RemoveRange(preRecords);
 
-        var initRecords = await _dbContext.UserInitialReviewCategories.Where(x => x.UserId == userId).ToListAsync(cancellationToken);
+        var initRecords = await _dbContext.UserInitialReviewCategories.Where(x => x.UserId == userId).ToListAsync(cancellationToken); // initRecords：initRecords
         _dbContext.UserInitialReviewCategories.RemoveRange(initRecords);
 
         if (preReviewDepartmentIds.Count > 0)

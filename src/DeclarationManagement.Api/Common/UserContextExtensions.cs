@@ -4,6 +4,9 @@ namespace DeclarationManagement.Api.Common;
 
 public static class UserContextExtensions
 {
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     public static long GetUserId(this ClaimsPrincipal user)
     {
         var idText = user.FindFirstValue(ClaimTypes.NameIdentifier)

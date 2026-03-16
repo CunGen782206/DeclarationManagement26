@@ -9,6 +9,9 @@ namespace DeclarationManagement.Api.Mapping;
 /// </summary>
 public class MappingProfile : Profile
 {
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public MappingProfile()
     {
         // 申报单：请求 DTO -> 实体

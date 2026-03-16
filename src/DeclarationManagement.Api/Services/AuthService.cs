@@ -9,17 +9,32 @@ using System.Text;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// Auth服务类。
+/// </summary>
 public class AuthService : IAuthService
 {
+    /// <summary>
+    /// 数据库上下文字段。
+    /// </summary>
     private readonly AppDbContext _dbContext;
+    /// <summary>
+    /// jwt配置字段。
+    /// </summary>
     private readonly JwtOptions _jwtOptions;
 
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public AuthService(AppDbContext dbContext, IOptions<JwtOptions> jwtOptions)
     {
         _dbContext = dbContext;
         _jwtOptions = jwtOptions.Value;
     }
 
+    /// <summary>
+    /// 登录处理。
+    /// </summary>
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.JobNumber == request.JobNumber && x.IsEnabled, cancellationToken)
@@ -33,9 +48,9 @@ public class AuthService : IAuthService
         user.LastLoginAt = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync(cancellationToken);
 
-        var expiresAt = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpireMinutes);
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey));
-        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var expiresAt = DateTime.UtcNow.AddMinutes(_jwtOptions.ExpireMinutes); // expiresAt：过期时间
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtOptions.SecretKey)); // key：key
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256); // creds：creds
 
         var claims = new List<Claim>
         {
@@ -59,6 +74,9 @@ public class AuthService : IAuthService
         };
     }
 
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     public async Task<CurrentUserDto> GetCurrentUserAsync(long userId, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
@@ -74,6 +92,9 @@ public class AuthService : IAuthService
         };
     }
 
+    /// <summary>
+    /// 变更处理。
+    /// </summary>
     public async Task ChangePasswordAsync(long userId, ChangePasswordRequestDto request, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)

@@ -2,6 +2,9 @@ using DeclarationManagement.Api.DTOs;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// ITask服务接口。
+/// </summary>
 public interface ITaskService
 {
     Task<List<TaskDto>> GetListAsync(CancellationToken cancellationToken = default);
