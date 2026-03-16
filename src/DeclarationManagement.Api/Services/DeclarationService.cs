@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// DeclarationService 类。
+/// </summary>
 public class DeclarationService : IDeclarationService
 {
     /// <summary>
@@ -21,6 +24,9 @@ public class DeclarationService : IDeclarationService
     /// </summary>
     private readonly IFileStorageService _fileStorageService;
 
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public DeclarationService(AppDbContext dbContext, IMapper mapper, IFileStorageService fileStorageService)
     {
         _dbContext = dbContext;

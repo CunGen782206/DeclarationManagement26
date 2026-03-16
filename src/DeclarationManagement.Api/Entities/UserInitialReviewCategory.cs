@@ -5,10 +5,25 @@ namespace DeclarationManagement.Api.Entities;
 /// </summary>
 public class UserInitialReviewCategory
 {
+    /// <summary>
+    /// UserId 属性。
+    /// </summary>
     public long UserId { get; set; }
+    /// <summary>
+    /// ProjectCategoryId 属性。
+    /// </summary>
     public long ProjectCategoryId { get; set; }
+    /// <summary>
+    /// CreatedAt 属性。
+    /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
+    /// <summary>
+    /// User 属性。
+    /// </summary>
     public User? User { get; set; }
+    /// <summary>
+    /// ProjectCategory 属性。
+    /// </summary>
     public ProjectCategory? ProjectCategory { get; set; }
 }

@@ -5,6 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// ReviewService 类。
+/// </summary>
 public class ReviewService : IReviewService
 {
     /// <summary>
@@ -12,6 +15,9 @@ public class ReviewService : IReviewService
     /// </summary>
     private readonly AppDbContext _dbContext;
 
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public ReviewService(AppDbContext dbContext)
     {
         _dbContext = dbContext;

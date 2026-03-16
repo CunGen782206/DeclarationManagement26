@@ -8,21 +8,57 @@ namespace DeclarationManagement.Api.Data;
 /// </summary>
 public class AppDbContext : DbContext
 {
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
     }
 
+    /// <summary>
+    /// Users 数据集。
+    /// </summary>
     public DbSet<User> Users => Set<User>();
+    /// <summary>
+    /// Departments 数据集。
+    /// </summary>
     public DbSet<Department> Departments => Set<Department>();
+    /// <summary>
+    /// ProjectCategories 数据集。
+    /// </summary>
     public DbSet<ProjectCategory> ProjectCategories => Set<ProjectCategory>();
+    /// <summary>
+    /// UserPreReviewDepartments 数据集。
+    /// </summary>
     public DbSet<UserPreReviewDepartment> UserPreReviewDepartments => Set<UserPreReviewDepartment>();
+    /// <summary>
+    /// UserInitialReviewCategories 数据集。
+    /// </summary>
     public DbSet<UserInitialReviewCategory> UserInitialReviewCategories => Set<UserInitialReviewCategory>();
+    /// <summary>
+    /// DeclarationTasks 数据集。
+    /// </summary>
     public DbSet<DeclarationTask> DeclarationTasks => Set<DeclarationTask>();
+    /// <summary>
+    /// Declarations 数据集。
+    /// </summary>
     public DbSet<Declaration> Declarations => Set<Declaration>();
+    /// <summary>
+    /// DeclarationAttachments 数据集。
+    /// </summary>
     public DbSet<DeclarationAttachment> DeclarationAttachments => Set<DeclarationAttachment>();
+    /// <summary>
+    /// DeclarationReviewRecords 数据集。
+    /// </summary>
     public DbSet<DeclarationReviewRecord> DeclarationReviewRecords => Set<DeclarationReviewRecord>();
+    /// <summary>
+    /// DeclarationFlowLogs 数据集。
+    /// </summary>
     public DbSet<DeclarationFlowLog> DeclarationFlowLogs => Set<DeclarationFlowLog>();
 
+    /// <summary>
+    /// OnModelCreating 方法。
+    /// </summary>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);

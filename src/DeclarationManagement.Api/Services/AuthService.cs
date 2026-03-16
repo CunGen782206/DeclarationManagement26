@@ -9,17 +9,32 @@ using System.Text;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// AuthService 类。
+/// </summary>
 public class AuthService : IAuthService
 {
+    /// <summary>
+    /// _dbContext 字段。
+    /// </summary>
     private readonly AppDbContext _dbContext;
+    /// <summary>
+    /// _jwtOptions 字段。
+    /// </summary>
     private readonly JwtOptions _jwtOptions;
 
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public AuthService(AppDbContext dbContext, IOptions<JwtOptions> jwtOptions)
     {
         _dbContext = dbContext;
         _jwtOptions = jwtOptions.Value;
     }
 
+    /// <summary>
+    /// 登录处理。
+    /// </summary>
     public async Task<LoginResponseDto> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.JobNumber == request.JobNumber && x.IsEnabled, cancellationToken)
@@ -59,6 +74,9 @@ public class AuthService : IAuthService
         };
     }
 
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     public async Task<CurrentUserDto> GetCurrentUserAsync(long userId, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.AsNoTracking().FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)
@@ -74,6 +92,9 @@ public class AuthService : IAuthService
         };
     }
 
+    /// <summary>
+    /// 变更处理。
+    /// </summary>
     public async Task ChangePasswordAsync(long userId, ChangePasswordRequestDto request, CancellationToken cancellationToken = default)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == userId, cancellationToken)

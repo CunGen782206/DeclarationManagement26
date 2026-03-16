@@ -10,6 +10,9 @@ using System.IO.Compression;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// StatisticsService 类。
+/// </summary>
 public class StatisticsService : IStatisticsService
 {
     /// <summary>
@@ -17,6 +20,9 @@ public class StatisticsService : IStatisticsService
     /// </summary>
     private readonly AppDbContext _dbContext;
 
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public StatisticsService(AppDbContext dbContext)
     {
         _dbContext = dbContext;
