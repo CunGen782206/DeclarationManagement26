@@ -5,6 +5,12 @@ namespace DeclarationManagement.Api.Entities;
 /// </summary>
 public abstract class BaseEntity
 {
+    /// <summary>
+    /// ID属性。
+    /// </summary>
     public long Id { get; set; }
+    /// <summary>
+    /// 创建时间时间属性。
+    /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 }
