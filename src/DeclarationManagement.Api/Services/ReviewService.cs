@@ -172,6 +172,29 @@ public class ReviewService : IReviewService
             }).ToListAsync(cancellationToken);
     }
 
+
+    /// <summary>
+    /// 获取某申报单的流程日志（累加历史）。
+    /// </summary>
+    public async Task<List<FlowLogDto>> GetFlowLogsAsync(long declarationId, long currentUserId, CancellationToken cancellationToken = default)
+    {
+        return await _dbContext.DeclarationFlowLogs
+            .AsNoTracking()
+            .Where(x => x.DeclarationId == declarationId)
+            .OrderBy(x => x.CreatedAt)
+            .Select(x => new FlowLogDto
+            {
+                Id = x.Id,
+                DeclarationId = x.DeclarationId,
+                FromStatus = x.FromStatus,
+                ToStatus = x.ToStatus,
+                ActionType = x.ActionType,
+                OperatorUserId = x.OperatorUserId,
+                Note = x.Note,
+                CreatedAt = x.CreatedAt
+            }).ToListAsync(cancellationToken);
+    }
+
     /// <summary>
     /// 校验“审核阶段”与“申报当前状态”是否匹配。
     /// </summary>

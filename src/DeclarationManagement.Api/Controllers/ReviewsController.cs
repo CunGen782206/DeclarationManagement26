@@ -56,4 +56,15 @@ public class ReviewsController : ControllerBase
         var result = await _reviewService.GetReviewRecordsAsync(declarationId, User.GetUserId(), cancellationToken); // result：结果
         return Ok(ApiResponse<List<ReviewRecordDto>>.Ok(result));
     }
+
+    /// <summary>
+    /// 获取流程日志。
+    /// </summary>
+    [HttpGet("{declarationId:long}/flow-logs")]
+    public async Task<ActionResult<ApiResponse<List<FlowLogDto>>>> FlowLogs(long declarationId, CancellationToken cancellationToken)
+    {
+        var result = await _reviewService.GetFlowLogsAsync(declarationId, User.GetUserId(), cancellationToken); // result：结果
+        return Ok(ApiResponse<List<FlowLogDto>>.Ok(result));
+    }
 }
+
