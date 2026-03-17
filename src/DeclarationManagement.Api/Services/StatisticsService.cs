@@ -10,37 +10,55 @@ using System.IO.Compression;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// 统计服务类。
+/// </summary>
 public class StatisticsService : IStatisticsService
 {
+    /// <summary>
+    /// 数据库上下文，用于统计查询与导出。
+    /// </summary>
     private readonly AppDbContext _dbContext;
 
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public StatisticsService(AppDbContext dbContext)
     {
         _dbContext = dbContext;
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
+    /// <summary>
+    /// 查询统计列表（按筛选条件返回申报集合）。
+    /// </summary>
     public async Task<List<StatisticsItemDto>> QueryAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
-        var q = BuildQuery(query);
-        var data = await q.ToListAsync(cancellationToken);
+        // q：可继续叠加条件的查询对象
+        var q = BuildQuery(query); // q：查询对象
+        // data：数据库结果集
+        var data = await q.ToListAsync(cancellationToken); // data：数据
         return data.Select(ToDto).ToList();
     }
 
+    /// <summary>
+    /// 导出 Excel（基于当前筛选结果）。
+    /// </summary>
     public async Task<ExportFileDto> ExportExcelAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
-        var data = await BuildQuery(query).ToListAsync(cancellationToken);
+        // data：待导出的申报数据
+        var data = await BuildQuery(query).ToListAsync(cancellationToken); // data：数据
 
         using var workbook = new XLWorkbook();
-        var ws = workbook.AddWorksheet("统计导出");
+        var ws = workbook.AddWorksheet("统计导出"); // ws：工作表
 
-        string[] headers = ["序号", "部门", "项目名称", "项目类别", "项目等级", "奖项级别", "参与形式", "负责人", "联系方式", "处理意见"];
+        string[] headers = ["序号", "部门", "项目名称", "项目类别", "项目等级", "奖项级别", "参与形式", "负责人", "联系方式", "处理意见"]; // headers：表头
         for (var i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
 
         for (var i = 0; i < data.Count; i++)
         {
-            var row = i + 2;
-            var d = data[i];
+            var row = i + 2; // row：行
+            var d = data[i]; // d：申报对象
             ws.Cell(row, 1).Value = i + 1;
             ws.Cell(row, 2).Value = d.Department?.Name ?? string.Empty;
             ws.Cell(row, 3).Value = d.ProjectName;
@@ -66,33 +84,39 @@ public class StatisticsService : IStatisticsService
         };
     }
 
+    /// <summary>
+    /// 归档导出 ZIP：仅导出初审通过表单，包含 PDF 与附件。
+    /// </summary>
     public async Task<ExportFileDto> ExportArchiveAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
+        // data：归档候选集（只保留初审通过）
         var data = await BuildQuery(query)
             .Where(x => x.CurrentStatus == DeclarationStatus.InitialReviewApproved)
             .Include(x => x.Attachments)
             .ToListAsync(cancellationToken);
 
+        // zipStream：最终压缩包内存流
         await using var zipStream = new MemoryStream();
         using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
         {
             foreach (var d in data)
             {
-                var folder = Sanitize($"{d.Department?.Name}-{d.PrincipalName}-{d.ProjectName}");
-                var pdfPath = $"{folder}/{folder}.pdf";
-                var pdfEntry = archive.CreateEntry(pdfPath);
+                // folder：每个表单归档目录（部门-负责人-项目名称）
+                var folder = Sanitize($"{d.Department?.Name}-{d.PrincipalName}-{d.ProjectName}"); // folder：文件夹
+                var pdfPath = $"{folder}/{folder}.pdf"; // pdfPath：PDF路径
+                var pdfEntry = archive.CreateEntry(pdfPath); // pdfEntry：PDF条目
                 await using (var entryStream = pdfEntry.Open())
                 {
-                    var bytes = BuildDeclarationPdf(d);
+                    var bytes = BuildDeclarationPdf(d); // bytes：字节
                     await entryStream.WriteAsync(bytes, cancellationToken);
                 }
 
                 foreach (var a in d.Attachments.Where(x => !x.IsDeleted))
                 {
                     if (!File.Exists(a.StoragePath)) continue;
-                    var fileEntry = archive.CreateEntry($"{folder}/附件/{a.OriginalFileName}");
+                    var fileEntry = archive.CreateEntry($"{folder}/附件/{a.OriginalFileName}"); // fileEntry：文件条目
                     await using var entryStream = fileEntry.Open();
-                    var bytes = await File.ReadAllBytesAsync(a.StoragePath, cancellationToken);
+                    var bytes = await File.ReadAllBytesAsync(a.StoragePath, cancellationToken); // bytes：字节
                     await entryStream.WriteAsync(bytes, cancellationToken);
                 }
             }
@@ -106,6 +130,9 @@ public class StatisticsService : IStatisticsService
         };
     }
 
+    /// <summary>
+    /// 构建统计查询（统一复用筛选逻辑）。
+    /// </summary>
     private IQueryable<Declaration> BuildQuery(StatisticsQueryDto query)
     {
         var q = _dbContext.Declarations
@@ -125,6 +152,9 @@ public class StatisticsService : IStatisticsService
         return q;
     }
 
+    /// <summary>
+    /// 将申报实体映射为统计列表 DTO。
+    /// </summary>
     private static StatisticsItemDto ToDto(Declaration x) => new()
     {
         DeclarationId = x.Id,
@@ -136,6 +166,9 @@ public class StatisticsService : IStatisticsService
         SubmittedAt = x.SubmittedAt
     };
 
+    /// <summary>
+    /// 生成单份申报 PDF。
+    /// </summary>
     private static byte[] BuildDeclarationPdf(Declaration d)
     {
         return Document.Create(container =>
@@ -158,6 +191,9 @@ public class StatisticsService : IStatisticsService
         }).GeneratePdf();
     }
 
+    /// <summary>
+    /// 清理非法文件名字符，避免生成目录失败。
+    /// </summary>
     private static string Sanitize(string name)
     {
         foreach (var c in Path.GetInvalidFileNameChars())
