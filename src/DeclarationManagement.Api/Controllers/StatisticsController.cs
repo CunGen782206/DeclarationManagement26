@@ -11,9 +11,6 @@ namespace DeclarationManagement.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-/// <summary>
-/// 统计Controller类。
-/// </summary>
 public class StatisticsController : ControllerBase
 {
     /// <summary>
@@ -33,9 +30,6 @@ public class StatisticsController : ControllerBase
     /// 查询处理。
     /// </summary>
     [HttpPost("query")]
-    /// <summary>
-    /// 查询处理。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<List<StatisticsItemDto>>>> Query([FromBody] StatisticsQueryDto query, CancellationToken cancellationToken)
     {
         var result = await _statisticsService.QueryAsync(query, cancellationToken); // result：结果
@@ -43,12 +37,9 @@ public class StatisticsController : ControllerBase
     }
 
     /// <summary>
-    /// 导出处理。
+    /// 导出Excel处理。
     /// </summary>
     [HttpPost("export/excel")]
-    /// <summary>
-    /// 导出处理。
-    /// </summary>
     public async Task<IActionResult> ExportExcel([FromBody] StatisticsQueryDto query, CancellationToken cancellationToken)
     {
         var file = await _statisticsService.ExportExcelAsync(query, cancellationToken); // file：文件
@@ -59,9 +50,6 @@ public class StatisticsController : ControllerBase
     /// 导出处理。
     /// </summary>
     [HttpPost("export/archive")]
-    /// <summary>
-    /// 导出处理。
-    /// </summary>
     public async Task<IActionResult> ExportArchive([FromBody] StatisticsQueryDto query, CancellationToken cancellationToken)
     {
         var file = await _statisticsService.ExportArchiveAsync(query, cancellationToken); // file：文件

@@ -11,9 +11,6 @@ namespace DeclarationManagement.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-/// <summary>
-/// 用户Controller类。
-/// </summary>
 public class UsersController : ControllerBase
 {
     /// <summary>
@@ -33,9 +30,6 @@ public class UsersController : ControllerBase
     /// 获取数据。
     /// </summary>
     [HttpGet]
-    /// <summary>
-    /// 获取数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<List<UserDto>>>> GetList(CancellationToken cancellationToken)
     {
         var result = await _userService.GetListAsync(cancellationToken); // result：结果
@@ -46,9 +40,6 @@ public class UsersController : ControllerBase
     /// 创建数据。
     /// </summary>
     [HttpPost]
-    /// <summary>
-    /// 创建数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<long>>> Create([FromBody] CreateUserRequestDto request, CancellationToken cancellationToken)
     {
         var id = await _userService.CreateAsync(request, cancellationToken); // id：ID
@@ -59,9 +50,6 @@ public class UsersController : ControllerBase
     /// 更新数据。
     /// </summary>
     [HttpPut("{id:long}")]
-    /// <summary>
-    /// 更新数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<string>>> Update(long id, [FromBody] UpdateUserRequestDto request, CancellationToken cancellationToken)
     {
         await _userService.UpdateAsync(id, request, cancellationToken);
@@ -72,9 +60,6 @@ public class UsersController : ControllerBase
     /// 删除数据。
     /// </summary>
     [HttpDelete("{id:long}")]
-    /// <summary>
-    /// 删除数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<string>>> Delete(long id, CancellationToken cancellationToken)
     {
         await _userService.DeleteAsync(id, cancellationToken);
@@ -85,9 +70,6 @@ public class UsersController : ControllerBase
     /// 重置数据。
     /// </summary>
     [HttpPost("{id:long}/reset-password")]
-    /// <summary>
-    /// 重置数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<string>>> ResetPassword(long id, CancellationToken cancellationToken)
     {
         await _userService.ResetPasswordAsync(id, cancellationToken);

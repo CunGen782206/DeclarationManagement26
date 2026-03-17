@@ -12,9 +12,6 @@ namespace DeclarationManagement.Api.Controllers;
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
-/// <summary>
-/// DeclarationsController类。
-/// </summary>
 public class DeclarationsController : ControllerBase
 {
     /// <summary>
@@ -34,9 +31,6 @@ public class DeclarationsController : ControllerBase
     /// 查询申报详情。
     /// </summary>
     [HttpGet("{id:long}")]
-    /// <summary>
-    /// 获取数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<DeclarationDetailDto>>> GetById(long id, CancellationToken cancellationToken)
     {
         var result = await _declarationService.GetDetailAsync(id, User.GetUserId(), cancellationToken); // result：结果
@@ -50,12 +44,9 @@ public class DeclarationsController : ControllerBase
     }
 
     /// <summary>
-    /// 新建申报草稿。
+    /// 创建数据
     /// </summary>
     [HttpPost]
-    /// <summary>
-    /// 创建数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<long>>> Create([FromBody] SaveDeclarationRequestDto request, CancellationToken cancellationToken)
     {
         var id = await _declarationService.CreateAsync(User.GetUserId(), request, cancellationToken); // id：ID
@@ -66,9 +57,6 @@ public class DeclarationsController : ControllerBase
     /// 修改申报草稿或驳回后的申报。
     /// </summary>
     [HttpPut("{id:long}")]
-    /// <summary>
-    /// 更新数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<string>>> Update(long id, [FromBody] SaveDeclarationRequestDto request, CancellationToken cancellationToken)
     {
         await _declarationService.UpdateAsync(id, User.GetUserId(), request, cancellationToken);
@@ -79,9 +67,6 @@ public class DeclarationsController : ControllerBase
     /// 提交申报。
     /// </summary>
     [HttpPost("submit")]
-    /// <summary>
-    /// 提交处理。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<string>>> Submit([FromBody] DeclarationSubmitRequestDto request, CancellationToken cancellationToken)
     {
         await _declarationService.SubmitAsync(User.GetUserId(), request, cancellationToken);
@@ -92,9 +77,6 @@ public class DeclarationsController : ControllerBase
     /// 驳回后重提申报。
     /// </summary>
     [HttpPost("resubmit")]
-    /// <summary>
-    /// 重新提交处理。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<string>>> Resubmit([FromBody] DeclarationResubmitRequestDto request, CancellationToken cancellationToken)
     {
         await _declarationService.ResubmitAsync(User.GetUserId(), request, cancellationToken);
@@ -105,9 +87,6 @@ public class DeclarationsController : ControllerBase
     /// 查询我的申报列表（分页）。
     /// </summary>
     [HttpGet("mine")]
-    /// <summary>
-    /// Mine 方法。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<PagedResultDto<DeclarationListItemDto>>>> Mine([FromQuery] DeclarationPageQueryDto query, CancellationToken cancellationToken)
     {
         var result = await _declarationService.GetMyDeclarationsAsync(User.GetUserId(), query, cancellationToken); // result：结果
@@ -119,9 +98,6 @@ public class DeclarationsController : ControllerBase
     /// </summary>
     [HttpPost("{id:long}/attachments")]
     [RequestSizeLimit(100 * 1024 * 1024)]
-    /// <summary>
-    /// 上传处理。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<long>>> Upload(long id, IFormFile file, CancellationToken cancellationToken)
     {
         var attachmentId = await _declarationService.UploadAttachmentAsync(id, User.GetUserId(), file, cancellationToken); // attachmentId：附件ID
@@ -132,9 +108,6 @@ public class DeclarationsController : ControllerBase
     /// 获取申报附件列表。
     /// </summary>
     [HttpGet("{id:long}/attachments")]
-    /// <summary>
-    /// 获取数据。
-    /// </summary>
     public async Task<ActionResult<ApiResponse<List<AttachmentDto>>>> GetAttachments(long id, CancellationToken cancellationToken)
     {
         var result = await _declarationService.GetAttachmentsAsync(id, User.GetUserId(), cancellationToken); // result：结果
@@ -145,9 +118,6 @@ public class DeclarationsController : ControllerBase
     /// 下载单个附件。
     /// </summary>
     [HttpGet("attachments/{attachmentId:long}/download")]
-    /// <summary>
-    /// 下载处理。
-    /// </summary>
     public async Task<IActionResult> DownloadAttachment(long attachmentId, CancellationToken cancellationToken)
     {
         var file = await _declarationService.DownloadAttachmentAsync(attachmentId, User.GetUserId(), cancellationToken); // file：文件
