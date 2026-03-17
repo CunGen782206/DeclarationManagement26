@@ -11,6 +11,9 @@ namespace DeclarationManagement.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
+/// <summary>
+/// AuthController类。
+/// </summary>
 public class AuthController : ControllerBase
 {
     /// <summary>
@@ -31,6 +34,9 @@ public class AuthController : ControllerBase
     /// </summary>
     [HttpPost("login")]
     [AllowAnonymous]
+    /// <summary>
+    /// 登录处理。
+    /// </summary>
     public async Task<ActionResult<ApiResponse<LoginResponseDto>>> Login([FromBody] LoginRequestDto request, CancellationToken cancellationToken)
     {
         var result = await _authService.LoginAsync(request, cancellationToken); // result：结果
@@ -42,6 +48,9 @@ public class AuthController : ControllerBase
     /// </summary>
     [HttpGet("me")]
     [Authorize]
+    /// <summary>
+    /// Me 方法。
+    /// </summary>
     public async Task<ActionResult<ApiResponse<CurrentUserDto>>> Me(CancellationToken cancellationToken)
     {
         var currentUserId = User.GetUserId(); // currentUserId：当前用户ID
@@ -54,6 +63,9 @@ public class AuthController : ControllerBase
     /// </summary>
     [HttpPost("change-password")]
     [Authorize]
+    /// <summary>
+    /// 变更处理。
+    /// </summary>
     public async Task<ActionResult<ApiResponse<string>>> ChangePassword([FromBody] ChangePasswordRequestDto request, CancellationToken cancellationToken)
     {
         await _authService.ChangePasswordAsync(User.GetUserId(), request, cancellationToken);
