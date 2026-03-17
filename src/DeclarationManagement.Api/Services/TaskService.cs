@@ -5,15 +5,27 @@ using Microsoft.EntityFrameworkCore;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// 任务服务类。
+/// </summary>
 public class TaskService : ITaskService
 {
+    /// <summary>
+    /// 数据库上下文字段。
+    /// </summary>
     private readonly AppDbContext _dbContext;
 
+    /// <summary>
+    /// 构造函数。
+    /// </summary>
     public TaskService(AppDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     public async Task<List<TaskDto>> GetListAsync(CancellationToken cancellationToken = default)
     {
         return await _dbContext.DeclarationTasks
@@ -29,6 +41,9 @@ public class TaskService : ITaskService
             }).ToListAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// 创建数据。
+    /// </summary>
     public async Task<long> CreateAsync(long operatorUserId, CreateTaskRequestDto request, CancellationToken cancellationToken = default)
     {
         if (request.EndAt <= request.StartAt)
@@ -51,6 +66,9 @@ public class TaskService : ITaskService
         return entity.Id;
     }
 
+    /// <summary>
+    /// 更新数据。
+    /// </summary>
     public async Task UpdateWindowAsync(long taskId, UpdateTaskWindowRequestDto request, CancellationToken cancellationToken = default)
     {
         if (request.EndAt <= request.StartAt)
@@ -68,6 +86,9 @@ public class TaskService : ITaskService
         await _dbContext.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// 更新数据。
+    /// </summary>
     public async Task UpdateStatusAsync(long taskId, UpdateTaskStatusRequestDto request, CancellationToken cancellationToken = default)
     {
         var task = await _dbContext.DeclarationTasks.FirstOrDefaultAsync(x => x.Id == taskId, cancellationToken)

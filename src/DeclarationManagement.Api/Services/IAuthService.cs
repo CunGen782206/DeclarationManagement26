@@ -2,6 +2,9 @@ using DeclarationManagement.Api.DTOs;
 
 namespace DeclarationManagement.Api.Services;
 
+/// <summary>
+/// IAuth服务接口。
+/// </summary>
 public interface IAuthService
 {
     Task<LoginResponseDto> LoginAsync(LoginRequestDto request, CancellationToken cancellationToken = default);
