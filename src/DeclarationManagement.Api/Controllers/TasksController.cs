@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
+/// <summary>
+/// TasksController类。
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -27,6 +30,9 @@ public class TasksController : ControllerBase
         _taskService = taskService;
     }
 
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     [HttpGet]
     /// <summary>
     /// 获取数据。
@@ -37,6 +43,9 @@ public class TasksController : ControllerBase
         return Ok(ApiResponse<List<TaskDto>>.Ok(result));
     }
 
+    /// <summary>
+    /// 创建数据。
+    /// </summary>
     [HttpPost]
     /// <summary>
     /// 创建数据。
@@ -47,6 +56,9 @@ public class TasksController : ControllerBase
         return Ok(ApiResponse<long>.Ok(id, "创建成功"));
     }
 
+    /// <summary>
+    /// 更新数据。
+    /// </summary>
     [HttpPut("{id:long}/window")]
     /// <summary>
     /// 更新数据。
@@ -57,6 +69,9 @@ public class TasksController : ControllerBase
         return Ok(ApiResponse<string>.Ok("OK", "修改成功"));
     }
 
+    /// <summary>
+    /// 更新数据。
+    /// </summary>
     [HttpPut("{id:long}/status")]
     /// <summary>
     /// 更新数据。

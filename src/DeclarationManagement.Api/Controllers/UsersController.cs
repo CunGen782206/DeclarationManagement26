@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
+/// <summary>
+/// 用户Controller类。
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -26,6 +29,9 @@ public class UsersController : ControllerBase
         _userService = userService;
     }
 
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     [HttpGet]
     /// <summary>
     /// 获取数据。
@@ -36,6 +42,9 @@ public class UsersController : ControllerBase
         return Ok(ApiResponse<List<UserDto>>.Ok(result));
     }
 
+    /// <summary>
+    /// 创建数据。
+    /// </summary>
     [HttpPost]
     /// <summary>
     /// 创建数据。
@@ -46,6 +55,9 @@ public class UsersController : ControllerBase
         return Ok(ApiResponse<long>.Ok(id, "创建成功"));
     }
 
+    /// <summary>
+    /// 更新数据。
+    /// </summary>
     [HttpPut("{id:long}")]
     /// <summary>
     /// 更新数据。
@@ -56,6 +68,9 @@ public class UsersController : ControllerBase
         return Ok(ApiResponse<string>.Ok("OK", "修改成功"));
     }
 
+    /// <summary>
+    /// 删除数据。
+    /// </summary>
     [HttpDelete("{id:long}")]
     /// <summary>
     /// 删除数据。
@@ -66,6 +81,9 @@ public class UsersController : ControllerBase
         return Ok(ApiResponse<string>.Ok("OK", "删除成功"));
     }
 
+    /// <summary>
+    /// 重置数据。
+    /// </summary>
     [HttpPost("{id:long}/reset-password")]
     /// <summary>
     /// 重置数据。

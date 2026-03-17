@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
+/// <summary>
+/// ReviewsController类。
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -27,6 +30,9 @@ public class ReviewsController : ControllerBase
         _reviewService = reviewService;
     }
 
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     [HttpGet("pending")]
     /// <summary>
     /// 获取数据。
@@ -37,6 +43,9 @@ public class ReviewsController : ControllerBase
         return Ok(ApiResponse<PagedResultDto<PendingReviewItemDto>>.Ok(result));
     }
 
+    /// <summary>
+    /// 执行处理。
+    /// </summary>
     [HttpPost("action")]
     /// <summary>
     /// 执行处理。
@@ -47,6 +56,9 @@ public class ReviewsController : ControllerBase
         return Ok(ApiResponse<string>.Ok("OK", "审核完成"));
     }
 
+    /// <summary>
+    /// Records 方法。
+    /// </summary>
     [HttpGet("{declarationId:long}/records")]
     /// <summary>
     /// Records 方法。

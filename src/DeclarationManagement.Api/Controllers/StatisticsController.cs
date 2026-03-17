@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
+/// <summary>
+/// 统计Controller类。
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -26,6 +29,9 @@ public class StatisticsController : ControllerBase
         _statisticsService = statisticsService;
     }
 
+    /// <summary>
+    /// 查询处理。
+    /// </summary>
     [HttpPost("query")]
     /// <summary>
     /// 查询处理。
@@ -36,6 +42,9 @@ public class StatisticsController : ControllerBase
         return Ok(ApiResponse<List<StatisticsItemDto>>.Ok(result));
     }
 
+    /// <summary>
+    /// 导出处理。
+    /// </summary>
     [HttpPost("export/excel")]
     /// <summary>
     /// 导出处理。
@@ -46,6 +55,9 @@ public class StatisticsController : ControllerBase
         return File(file.Content, file.ContentType, file.FileName);
     }
 
+    /// <summary>
+    /// 导出处理。
+    /// </summary>
     [HttpPost("export/archive")]
     /// <summary>
     /// 导出处理。

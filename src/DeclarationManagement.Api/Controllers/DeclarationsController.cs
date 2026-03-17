@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
+/// <summary>
+/// DeclarationsController类。
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 [Authorize]
@@ -30,6 +33,9 @@ public class DeclarationsController : ControllerBase
     /// <summary>
     /// 查询申报详情。
     /// </summary>
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     [HttpGet("{id:long}")]
     /// <summary>
     /// 获取数据。
@@ -49,6 +55,9 @@ public class DeclarationsController : ControllerBase
     /// <summary>
     /// 新建申报草稿。
     /// </summary>
+    /// <summary>
+    /// 创建数据。
+    /// </summary>
     [HttpPost]
     /// <summary>
     /// 创建数据。
@@ -61,6 +70,9 @@ public class DeclarationsController : ControllerBase
 
     /// <summary>
     /// 修改申报草稿或驳回后的申报。
+    /// </summary>
+    /// <summary>
+    /// 更新数据。
     /// </summary>
     [HttpPut("{id:long}")]
     /// <summary>
@@ -75,6 +87,9 @@ public class DeclarationsController : ControllerBase
     /// <summary>
     /// 提交申报。
     /// </summary>
+    /// <summary>
+    /// 提交处理。
+    /// </summary>
     [HttpPost("submit")]
     /// <summary>
     /// 提交处理。
@@ -87,6 +102,9 @@ public class DeclarationsController : ControllerBase
 
     /// <summary>
     /// 驳回后重提申报。
+    /// </summary>
+    /// <summary>
+    /// 重新提交处理。
     /// </summary>
     [HttpPost("resubmit")]
     /// <summary>
@@ -101,6 +119,9 @@ public class DeclarationsController : ControllerBase
     /// <summary>
     /// 查询我的申报列表（分页）。
     /// </summary>
+    /// <summary>
+    /// Mine 方法。
+    /// </summary>
     [HttpGet("mine")]
     /// <summary>
     /// Mine 方法。
@@ -113,6 +134,9 @@ public class DeclarationsController : ControllerBase
 
     /// <summary>
     /// 上传申报附件。
+    /// </summary>
+    /// <summary>
+    /// 上传处理。
     /// </summary>
     [HttpPost("{id:long}/attachments")]
     [RequestSizeLimit(100 * 1024 * 1024)]
@@ -128,6 +152,9 @@ public class DeclarationsController : ControllerBase
     /// <summary>
     /// 获取申报附件列表。
     /// </summary>
+    /// <summary>
+    /// 获取数据。
+    /// </summary>
     [HttpGet("{id:long}/attachments")]
     /// <summary>
     /// 获取数据。
@@ -140,6 +167,9 @@ public class DeclarationsController : ControllerBase
 
     /// <summary>
     /// 下载单个附件。
+    /// </summary>
+    /// <summary>
+    /// 下载处理。
     /// </summary>
     [HttpGet("attachments/{attachmentId:long}/download")]
     /// <summary>

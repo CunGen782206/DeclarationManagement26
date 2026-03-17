@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace DeclarationManagement.Api.Controllers;
 
+/// <summary>
+/// AuthController类。
+/// </summary>
 [ApiController]
 [Route("api/[controller]")]
 /// <summary>
@@ -26,6 +29,9 @@ public class AuthController : ControllerBase
         _authService = authService;
     }
 
+    /// <summary>
+    /// 登录处理。
+    /// </summary>
     [HttpPost("login")]
     [AllowAnonymous]
     /// <summary>
@@ -37,6 +43,9 @@ public class AuthController : ControllerBase
         return Ok(ApiResponse<LoginResponseDto>.Ok(result));
     }
 
+    /// <summary>
+    /// Me 方法。
+    /// </summary>
     [HttpGet("me")]
     [Authorize]
     /// <summary>
@@ -49,6 +58,9 @@ public class AuthController : ControllerBase
         return Ok(ApiResponse<CurrentUserDto>.Ok(result));
     }
 
+    /// <summary>
+    /// 变更处理。
+    /// </summary>
     [HttpPost("change-password")]
     [Authorize]
     /// <summary>
