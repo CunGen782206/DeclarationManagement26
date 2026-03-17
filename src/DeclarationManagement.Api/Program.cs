@@ -1,4 +1,5 @@
 using DeclarationManagement.Api.Data;
+using DeclarationManagement.Api.DTOs;
 using DeclarationManagement.Api.Mapping;
 using DeclarationManagement.Api.Repositories;
 using DeclarationManagement.Api.Services;
@@ -33,7 +34,11 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("SuperAdminOnly", policy =>
+        policy.RequireClaim("isSuperAdmin", bool.TrueString));
+});
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -64,6 +69,23 @@ if (enableSwagger)
         options.RoutePrefix = swaggerRoutePrefix;
     });
 }
+
+app.UseExceptionHandler(handlerApp =>
+{
+    handlerApp.Run(async context =>
+    {
+        var exceptionFeature = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+        var exception = exceptionFeature?.Error;
+
+        context.Response.ContentType = "application/json";
+        context.Response.StatusCode = exception is InvalidOperationException
+            ? StatusCodes.Status400BadRequest
+            : StatusCodes.Status500InternalServerError;
+
+        var payload = ApiResponse<object>.Fail(exception?.Message ?? "服务器异常");
+        await context.Response.WriteAsJsonAsync(payload);
+    });
+});
 
 app.UseHttpsRedirection();
 app.UseAuthentication();

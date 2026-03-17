@@ -10,7 +10,7 @@ namespace DeclarationManagement.Api.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/[controller]")]
-[Authorize]
+[Authorize(Policy = "SuperAdminOnly")]
 public class StatisticsController : ControllerBase
 {
     /// <summary>

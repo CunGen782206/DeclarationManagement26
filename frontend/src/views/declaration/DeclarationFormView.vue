@@ -2,7 +2,17 @@
 import { computed, onMounted, reactive, ref } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { ElMessage } from 'element-plus';
-import { createDeclarationApi, getDeclarationDetailApi, resubmitDeclarationApi, submitDeclarationApi, updateDeclarationApi } from '@/api/declaration';
+import {
+  createDeclarationApi,
+  downloadAttachmentApi,
+  getAttachmentsApi,
+  getDeclarationDetailApi,
+  resubmitDeclarationApi,
+  submitDeclarationApi,
+  updateDeclarationApi,
+  uploadAttachmentApi
+} from '@/api/declaration';
+import { getFlowLogsApi, getReviewRecordsApi } from '@/api/review';
 import { listTasksApi } from '@/api/task';
 import { awardLevelOptions, categoryOptions, departmentOptions, participationTypeOptions, projectLevelOptions } from '@/utils/constants';
 
@@ -10,6 +20,9 @@ const route = useRoute();
 const router = useRouter();
 const declarationId = computed(() => Number(route.params.id || 0));
 const tasks = ref<{ id: number; taskName: string }[]>([]);
+const attachments = ref<any[]>([]);
+const reviewRecords = ref<any[]>([]);
+const flowLogs = ref<any[]>([]);
 
 const form = reactive({
   taskId: undefined as number | undefined,
@@ -26,6 +39,18 @@ const form = reactive({
   projectContent: '',
   projectAchievement: ''
 });
+
+const loadExtraData = async () => {
+  if (!declarationId.value) return;
+  const [attachmentRes, recordsRes, logsRes] = await Promise.all([
+    getAttachmentsApi(declarationId.value),
+    getReviewRecordsApi(declarationId.value),
+    getFlowLogsApi(declarationId.value)
+  ]);
+  attachments.value = attachmentRes.data.data;
+  reviewRecords.value = recordsRes.data.data;
+  flowLogs.value = logsRes.data.data;
+};
 
 const save = async () => {
   if (!declarationId.value) {
@@ -50,12 +75,30 @@ const resubmit = async () => {
   ElMessage.success('重提成功');
 };
 
+const onUploadChange = async (file: any) => {
+  if (!declarationId.value || !file.raw) return;
+  await uploadAttachmentApi(declarationId.value, file.raw as File);
+  ElMessage.success('附件上传成功');
+  await loadExtraData();
+};
+
+const downloadAttachment = async (attachment: any) => {
+  const res = await downloadAttachmentApi(attachment.id);
+  const url = window.URL.createObjectURL(res.data);
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = attachment.originalFileName;
+  link.click();
+  window.URL.revokeObjectURL(url);
+};
+
 onMounted(async () => {
   const taskRes = await listTasksApi();
   tasks.value = taskRes.data.data;
   if (declarationId.value) {
     const res = await getDeclarationDetailApi(declarationId.value);
     Object.assign(form, res.data.data);
+    await loadExtraData();
   }
 });
 </script>
@@ -86,6 +129,44 @@ onMounted(async () => {
         <el-button type="success" @click="submit" :disabled="!declarationId">提交</el-button>
         <el-button @click="resubmit" :disabled="!declarationId">驳回后重提</el-button>
       </div>
+    </el-card>
+
+    <el-card style="margin-top: 16px" v-if="declarationId">
+      <template #header>附件上传下载</template>
+      <el-upload :auto-upload="false" :show-file-list="false" :on-change="onUploadChange">
+        <el-button type="primary">上传附件</el-button>
+      </el-upload>
+      <el-table :data="attachments" border style="margin-top: 12px">
+        <el-table-column prop="originalFileName" label="文件名" />
+        <el-table-column prop="fileSizeBytes" label="大小(Byte)" width="120" />
+        <el-table-column prop="uploadedAt" label="上传时间" width="180" />
+        <el-table-column label="操作" width="120">
+          <template #default="scope">
+            <el-button type="primary" link @click="downloadAttachment(scope.row)">下载</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+    </el-card>
+
+    <el-card style="margin-top: 16px" v-if="declarationId">
+      <template #header>审核历史与流程日志</template>
+      <h4>审核记录</h4>
+      <el-table :data="reviewRecords" border>
+        <el-table-column prop="reviewStage" label="阶段" width="100" />
+        <el-table-column prop="reviewAction" label="动作" width="100" />
+        <el-table-column prop="reason" label="原因" />
+        <el-table-column prop="recognizedAmount" label="认定金额" width="120" />
+        <el-table-column prop="reviewedAt" label="审核时间" width="180" />
+      </el-table>
+
+      <h4 style="margin-top: 16px">流程日志</h4>
+      <el-table :data="flowLogs" border>
+        <el-table-column prop="fromStatus" label="来源状态" width="120" />
+        <el-table-column prop="toStatus" label="目标状态" width="120" />
+        <el-table-column prop="actionType" label="动作类型" width="120" />
+        <el-table-column prop="note" label="备注" />
+        <el-table-column prop="createdAt" label="时间" width="180" />
+      </el-table>
     </el-card>
   </div>
 </template>

@@ -13,7 +13,11 @@ const menuItems = computed(() => {
     { index: '/reviews', label: '审核页' }
   ];
   if (auth.isSuperAdmin) {
-    base.push({ index: '/statistics', label: '统计页' }, { index: '/users', label: '用户管理页' });
+    base.push(
+      { index: '/tasks', label: '任务管理页' },
+      { index: '/statistics', label: '统计页' },
+      { index: '/users', label: '用户管理页' }
+    );
   }
   return base;
 });

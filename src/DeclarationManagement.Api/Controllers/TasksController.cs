@@ -42,6 +42,7 @@ public class TasksController : ControllerBase
     /// 创建数据。
     /// </summary>
     [HttpPost]
+    [Authorize(Policy = "SuperAdminOnly")]
     public async Task<ActionResult<ApiResponse<long>>> Create([FromBody] CreateTaskRequestDto request, CancellationToken cancellationToken)
     {
         var id = await _taskService.CreateAsync(User.GetUserId(), request, cancellationToken); // id：ID
@@ -52,6 +53,7 @@ public class TasksController : ControllerBase
     /// 更新数据。
     /// </summary>
     [HttpPut("{id:long}/window")]
+    [Authorize(Policy = "SuperAdminOnly")]
     public async Task<ActionResult<ApiResponse<string>>> UpdateWindow(long id, [FromBody] UpdateTaskWindowRequestDto request, CancellationToken cancellationToken)
     {
         await _taskService.UpdateWindowAsync(id, request, cancellationToken);
@@ -62,6 +64,7 @@ public class TasksController : ControllerBase
     /// 更新数据。
     /// </summary>
     [HttpPut("{id:long}/status")]
+    [Authorize(Policy = "SuperAdminOnly")]
     public async Task<ActionResult<ApiResponse<string>>> UpdateStatus(long id, [FromBody] UpdateTaskStatusRequestDto request, CancellationToken cancellationToken)
     {
         await _taskService.UpdateStatusAsync(id, request, cancellationToken);
