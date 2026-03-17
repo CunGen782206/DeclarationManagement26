@@ -23,3 +23,9 @@ export const uploadAttachmentApi = (id: number, file: File) => {
   formData.append('file', file);
   return http.post(`/declarations/${id}/attachments`, formData);
 };
+
+export const getAttachmentsApi = (id: number) =>
+  http.get(`/declarations/${id}/attachments`);
+
+export const downloadAttachmentApi = (attachmentId: number) =>
+  http.get(`/declarations/attachments/${attachmentId}/download`, { responseType: 'blob' });

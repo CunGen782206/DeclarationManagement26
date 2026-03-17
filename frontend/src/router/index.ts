@@ -14,6 +14,7 @@ const router = createRouter({
         { path: 'declarations/new', component: () => import('@/views/declaration/DeclarationFormView.vue') },
         { path: 'declarations/:id', component: () => import('@/views/declaration/DeclarationFormView.vue') },
         { path: 'reviews', component: () => import('@/views/review/ReviewView.vue') },
+        { path: 'tasks', component: () => import('@/views/task/TaskManagementView.vue') },
         { path: 'statistics', component: () => import('@/views/statistics/StatisticsView.vue') },
         { path: 'users', component: () => import('@/views/user/UserManagementView.vue') }
       ]
@@ -40,7 +41,7 @@ router.beforeEach(async (to) => {
     }
   }
 
-  if ((to.path === '/statistics' || to.path === '/users') && !auth.isSuperAdmin) {
+  if ((to.path === '/statistics' || to.path === '/users' || to.path === '/tasks') && !auth.isSuperAdmin) {
     return '/declarations';
   }
 
