@@ -8,7 +8,11 @@ public class DeclarationAttachment : BaseEntity
     /// <summary>
     /// 申报ID属性。
     /// </summary>
-    public long DeclarationId { get; set; }
+    public long? DeclarationId { get; set; }
+    /// <summary>
+    /// 涓存椂闄勪欢鍏抽敭灞炴€с€?
+    /// </summary>
+    public string? TempAttachmentKey { get; set; }
     /// <summary>
     /// 原始文件名称属性。
     /// </summary>

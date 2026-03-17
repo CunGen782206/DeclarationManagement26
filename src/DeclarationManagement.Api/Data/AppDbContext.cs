@@ -170,6 +170,16 @@ public class AppDbContext : DbContext
             entity.Property(x => x.StorageFileName).HasMaxLength(260).IsRequired();
             entity.Property(x => x.StoragePath).HasMaxLength(500).IsRequired();
             entity.Property(x => x.ContentType).HasMaxLength(100);
+            entity.Property(x => x.TempAttachmentKey).HasMaxLength(64);
+            entity.HasIndex(x => x.TempAttachmentKey);
+            entity.HasOne(x => x.Declaration)
+                .WithMany(x => x.Attachments)
+                .HasForeignKey(x => x.DeclarationId)
+                .OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(x => x.UploadedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.UploadedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // DeclarationReviewRecords

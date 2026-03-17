@@ -45,4 +45,19 @@ public class FileStorageService : IFileStorageService
     {
         return await File.ReadAllBytesAsync(storagePath, cancellationToken);
     }
+
+    /// <summary>
+    /// DeleteAsync 鏂规硶銆?
+    /// </summary>
+    public Task DeleteAsync(string storagePath, CancellationToken cancellationToken = default)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+
+        if (File.Exists(storagePath))
+        {
+            File.Delete(storagePath);
+        }
+
+        return Task.CompletedTask;
+    }
 }

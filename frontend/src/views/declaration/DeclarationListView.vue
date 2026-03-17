@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { onMounted, reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
+import { ElMessage } from 'element-plus';
 import { getMyDeclarationsApi } from '@/api/declaration';
 import StatusTag from '@/components/StatusTag.vue';
+import { DeclarationStatus } from '@/types/common';
 import type { DeclarationItem } from '@/types/domain';
 import { categoryOptions, declarationStatusOptions, departmentOptions } from '@/utils/constants';
 
@@ -21,7 +23,20 @@ const query = reactive({
   statuses: [] as number[]
 });
 
+const validateDateRange = () => {
+  if (query.startDate && query.endDate && query.startDate > query.endDate) {
+    ElMessage.warning('开始日期不能晚于结束日期');
+    return false;
+  }
+
+  return true;
+};
+
 const loadData = async () => {
+  if (!validateDateRange()) {
+    return;
+  }
+
   loading.value = true;
   try {
     const res = await getMyDeclarationsApi(query);
@@ -30,6 +45,22 @@ const loadData = async () => {
   } finally {
     loading.value = false;
   }
+};
+
+const handleSearch = async () => {
+  query.pageIndex = 1;
+  await loadData();
+};
+
+const openDeclaration = (row: DeclarationItem) => {
+  const isEditable = row.currentStatus === DeclarationStatus.PreReviewRejected
+    || row.currentStatus === DeclarationStatus.InitialReviewRejected
+    || row.currentStatus === DeclarationStatus.Draft;
+
+  router.push({
+    path: `/declarations/${row.id}`,
+    query: { mode: isEditable ? 'edit' : 'view' }
+  });
 };
 
 onMounted(loadData);
@@ -50,7 +81,7 @@ onMounted(loadData);
         <el-option v-for="item in declarationStatusOptions" :key="item.value" :label="item.label" :value="item.value" />
       </el-select>
       <div style="display: flex; gap: 8px">
-        <el-button type="primary" @click="loadData">查询</el-button>
+        <el-button type="primary" @click="handleSearch">查询</el-button>
         <el-button type="success" @click="router.push('/declarations/new')">新建申报</el-button>
       </div>
     </div>
@@ -69,7 +100,7 @@ onMounted(loadData);
       </el-table-column>
       <el-table-column label="操作" width="120">
         <template #default="{ row }">
-          <el-button link type="primary" @click="router.push(`/declarations/${row.id}`)">{{ row.action }}</el-button>
+          <el-button link type="primary" @click="openDeclaration(row)">{{ row.action }}</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -81,7 +112,7 @@ onMounted(loadData);
       :total="total"
       layout="total, prev, pager, next, jumper"
       @current-change="loadData"
-      @size-change="loadData"
+      @size-change="handleSearch"
     />
   </div>
 </template>

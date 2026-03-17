@@ -21,12 +21,14 @@ public class StatisticsService : IStatisticsService
 
     public async Task<List<StatisticsItemDto>> QueryAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
+        ValidateDateRange(query.StartDate, query.EndDate);
         var data = await BuildQuery(query).ToListAsync(cancellationToken);
         return data.Select(ToDto).ToList();
     }
 
     public async Task<ExportFileDto> ExportExcelAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
+        ValidateDateRange(query.StartDate, query.EndDate);
         var data = await BuildQuery(query).ToListAsync(cancellationToken);
 
         using var workbook = new XLWorkbook();
@@ -82,6 +84,7 @@ public class StatisticsService : IStatisticsService
 
     public async Task<ExportFileDto> ExportArchiveAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
+        ValidateDateRange(query.StartDate, query.EndDate);
         var data = await BuildQuery(query)
             .Where(x => x.CurrentStatus == DeclarationStatus.InitialReviewApproved)
             .ToListAsync(cancellationToken);
@@ -140,12 +143,13 @@ public class StatisticsService : IStatisticsService
 
         if (query.StartDate.HasValue)
         {
-            q = q.Where(x => x.SubmittedAt >= query.StartDate.Value);
+            q = q.Where(x => x.SubmittedAt >= query.StartDate.Value.Date);
         }
 
         if (query.EndDate.HasValue)
         {
-            q = q.Where(x => x.SubmittedAt <= query.EndDate.Value);
+            var endExclusive = query.EndDate.Value.Date.AddDays(1);
+            q = q.Where(x => x.SubmittedAt < endExclusive);
         }
 
         if (query.DepartmentIds is { Count: > 0 })
@@ -236,5 +240,13 @@ public class StatisticsService : IStatisticsService
         }
 
         return name;
+    }
+
+    private static void ValidateDateRange(DateTime? startDate, DateTime? endDate)
+    {
+        if (startDate.HasValue && endDate.HasValue && startDate.Value.Date > endDate.Value.Date)
+        {
+            throw new InvalidOperationException("开始日期不能晚于结束日期");
+        }
     }
 }

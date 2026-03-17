@@ -16,6 +16,8 @@ public class ReviewService : IReviewService
 
     public async Task<PagedResultDto<PendingReviewItemDto>> GetPendingAsync(long reviewerUserId, PendingReviewQueryDto query, CancellationToken cancellationToken = default)
     {
+        ValidateDateRange(query.StartDate, query.EndDate);
+
         var preDeptIds = await _dbContext.UserPreReviewDepartments
             .Where(x => x.UserId == reviewerUserId)
             .Select(x => x.DepartmentId)
@@ -36,12 +38,13 @@ public class ReviewService : IReviewService
 
         if (query.StartDate.HasValue)
         {
-            reviewsQuery = reviewsQuery.Where(x => x.SubmittedAt >= query.StartDate.Value);
+            reviewsQuery = reviewsQuery.Where(x => x.SubmittedAt >= query.StartDate.Value.Date);
         }
 
         if (query.EndDate.HasValue)
         {
-            reviewsQuery = reviewsQuery.Where(x => x.SubmittedAt <= query.EndDate.Value);
+            var endExclusive = query.EndDate.Value.Date.AddDays(1);
+            reviewsQuery = reviewsQuery.Where(x => x.SubmittedAt < endExclusive);
         }
 
         if (!string.IsNullOrWhiteSpace(query.ProjectName))
@@ -96,12 +99,14 @@ public class ReviewService : IReviewService
 
         if (!IsStageMatched(declaration.CurrentStatus, request.ReviewStage))
         {
-            throw new InvalidOperationException("审核阶段与表单当前状态不匹配");
+            throw new InvalidOperationException("审核阶段与当前状态不匹配");
         }
 
         if (request.ReviewStage == ReviewStage.PreReview)
         {
-            var can = await _dbContext.UserPreReviewDepartments.AnyAsync(x => x.UserId == reviewerUserId && x.DepartmentId == declaration.DepartmentId, cancellationToken);
+            var can = await _dbContext.UserPreReviewDepartments.AnyAsync(
+                x => x.UserId == reviewerUserId && x.DepartmentId == declaration.DepartmentId,
+                cancellationToken);
             if (!can)
             {
                 throw new InvalidOperationException("无部门预审权限");
@@ -109,7 +114,9 @@ public class ReviewService : IReviewService
         }
         else
         {
-            var can = await _dbContext.UserInitialReviewCategories.AnyAsync(x => x.UserId == reviewerUserId && x.ProjectCategoryId == declaration.ProjectCategoryId, cancellationToken);
+            var can = await _dbContext.UserInitialReviewCategories.AnyAsync(
+                x => x.UserId == reviewerUserId && x.ProjectCategoryId == declaration.ProjectCategoryId,
+                cancellationToken);
             if (!can)
             {
                 throw new InvalidOperationException("无初审权限");
@@ -235,5 +242,13 @@ public class ReviewService : IReviewService
             (ReviewStage.InitialReview, ReviewAction.Reject) => FlowActionType.InitialReviewReject,
             _ => throw new InvalidOperationException("不支持的审核动作")
         };
+    }
+
+    private static void ValidateDateRange(DateTime? startDate, DateTime? endDate)
+    {
+        if (startDate.HasValue && endDate.HasValue && startDate.Value.Date > endDate.Value.Date)
+        {
+            throw new InvalidOperationException("开始日期不能晚于结束日期");
+        }
     }
 }

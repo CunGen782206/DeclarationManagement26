@@ -49,52 +49,69 @@ public class DeclarationService : IDeclarationService
         await _dbContext.Declarations.AddAsync(entity, cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        if (!string.IsNullOrWhiteSpace(request.TempAttachmentKey))
+        {
+            await BindTemporaryAttachmentsAsync(request.TempAttachmentKey, applicantUserId, entity.Id, cancellationToken);
+        }
+
         return entity.Id;
     }
 
     public async Task UpdateAsync(long declarationId, long applicantUserId, SaveDeclarationRequestDto request, CancellationToken cancellationToken = default)
     {
-        var entity = await _dbContext.Declarations.FirstOrDefaultAsync(x => x.Id == declarationId && x.ApplicantUserId == applicantUserId, cancellationToken)
-            ?? throw new InvalidOperationException("申报单不存在");
+        var entity = await _dbContext.Declarations.FirstOrDefaultAsync(
+            x => x.Id == declarationId && x.ApplicantUserId == applicantUserId,
+            cancellationToken) ?? throw new InvalidOperationException("申报单不存在");
 
-        if (entity.CurrentStatus is not (DeclarationStatus.Draft or DeclarationStatus.PreReviewRejected or DeclarationStatus.InitialReviewRejected))
-        {
-            throw new InvalidOperationException("当前状态不可修改");
-        }
-
-        entity.TaskId = request.TaskId;
-        entity.PrincipalName = request.PrincipalName;
-        entity.ContactPhone = request.ContactPhone;
-        entity.DepartmentId = request.DepartmentId;
-        entity.ProjectName = request.ProjectName;
-        entity.ProjectCategoryId = request.ProjectCategoryId;
-        entity.ProjectLevel = request.ProjectLevel;
-        entity.AwardLevel = request.AwardLevel;
-        entity.ParticipationType = request.ParticipationType;
-        entity.ApprovalDocumentName = request.ApprovalDocumentName;
-        entity.SealUnitAndDate = request.SealUnitAndDate;
-        entity.ProjectContent = request.ProjectContent;
-        entity.ProjectAchievement = request.ProjectAchievement;
+        EnsureCanEdit(entity);
+        ApplyDeclarationChanges(entity, request);
         entity.VersionNo += 1;
         entity.UpdatedAt = DateTime.UtcNow;
 
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(request.TempAttachmentKey))
+        {
+            await BindTemporaryAttachmentsAsync(request.TempAttachmentKey, applicantUserId, entity.Id, cancellationToken);
+        }
     }
 
-    public async Task SubmitAsync(long applicantUserId, DeclarationSubmitRequestDto request, CancellationToken cancellationToken = default)
+    public async Task<long> SubmitAsync(long applicantUserId, DeclarationSubmitRequestDto request, CancellationToken cancellationToken = default)
     {
-        var entity = await _dbContext.Declarations.FirstOrDefaultAsync(x => x.Id == request.DeclarationId && x.ApplicantUserId == applicantUserId, cancellationToken)
-            ?? throw new InvalidOperationException("申报单不存在");
+        ValidateSubmitRequest(request);
 
-        if (entity.CurrentStatus is not (DeclarationStatus.Draft or DeclarationStatus.PreReviewRejected or DeclarationStatus.InitialReviewRejected))
+        var now = DateTime.UtcNow;
+        var isExisting = request.DeclarationId.HasValue;
+        Declaration entity;
+
+        if (isExisting)
         {
-            throw new InvalidOperationException("当前状态不可提交");
+            entity = await _dbContext.Declarations.FirstOrDefaultAsync(
+                x => x.Id == request.DeclarationId!.Value && x.ApplicantUserId == applicantUserId,
+                cancellationToken) ?? throw new InvalidOperationException("申报单不存在");
+
+            EnsureCanEdit(entity);
+            ApplyDeclarationChanges(entity, request);
+            entity.VersionNo += 1;
+        }
+        else
+        {
+            entity = new Declaration
+            {
+                ApplicantUserId = applicantUserId,
+                VersionNo = 1,
+                CurrentStatus = DeclarationStatus.Draft,
+                CurrentNode = DeclarationNode.Declaration,
+                CreatedAt = now
+            };
+
+            ApplyDeclarationChanges(entity, request);
+            await _dbContext.Declarations.AddAsync(entity, cancellationToken);
         }
 
         var task = await _dbContext.DeclarationTasks.FirstOrDefaultAsync(x => x.Id == entity.TaskId, cancellationToken)
             ?? throw new InvalidOperationException("申报任务不存在");
 
-        var now = DateTime.UtcNow;
         if (!task.IsEnabled || now < task.StartAt || now > task.EndAt)
         {
             throw new InvalidOperationException($"不在申报时间窗口内：{task.StartAt:yyyy-MM-dd HH:mm:ss} ~ {task.EndAt:yyyy-MM-dd HH:mm:ss}");
@@ -106,26 +123,31 @@ public class DeclarationService : IDeclarationService
         entity.SubmittedAt = now;
         entity.UpdatedAt = now;
 
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(request.TempAttachmentKey))
+        {
+            await BindTemporaryAttachmentsAsync(request.TempAttachmentKey, applicantUserId, entity.Id, cancellationToken);
+        }
+
         await _dbContext.DeclarationFlowLogs.AddAsync(new DeclarationFlowLog
         {
             DeclarationId = entity.Id,
             FromStatus = fromStatus,
             ToStatus = DeclarationStatus.PendingPreReview,
-            ActionType = fromStatus == DeclarationStatus.Draft ? FlowActionType.Submit : FlowActionType.Resubmit,
+            ActionType = isExisting && fromStatus != DeclarationStatus.Draft ? FlowActionType.Resubmit : FlowActionType.Submit,
             OperatorUserId = applicantUserId,
             CreatedAt = now
         }, cancellationToken);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
-    }
-
-    public Task ResubmitAsync(long applicantUserId, DeclarationResubmitRequestDto request, CancellationToken cancellationToken = default)
-    {
-        return SubmitAsync(applicantUserId, new DeclarationSubmitRequestDto { DeclarationId = request.DeclarationId }, cancellationToken);
+        return entity.Id;
     }
 
     public async Task<PagedResultDto<DeclarationListItemDto>> GetMyDeclarationsAsync(long applicantUserId, DeclarationPageQueryDto query, CancellationToken cancellationToken = default)
     {
+        ValidateDateRange(query.StartDate, query.EndDate);
+
         var q = _dbContext.Declarations
             .AsNoTracking()
             .Include(x => x.Task)
@@ -135,12 +157,13 @@ public class DeclarationService : IDeclarationService
 
         if (query.StartDate.HasValue)
         {
-            q = q.Where(x => x.SubmittedAt >= query.StartDate.Value);
+            q = q.Where(x => x.SubmittedAt >= query.StartDate.Value.Date);
         }
 
         if (query.EndDate.HasValue)
         {
-            q = q.Where(x => x.SubmittedAt <= query.EndDate.Value);
+            var endExclusive = query.EndDate.Value.Date.AddDays(1);
+            q = q.Where(x => x.SubmittedAt < endExclusive);
         }
 
         if (query.DepartmentIds is { Count: > 0 })
@@ -177,7 +200,9 @@ public class DeclarationService : IDeclarationService
             CurrentStatus = x.CurrentStatus,
             SubmittedAt = x.SubmittedAt,
             TaskName = x.Task?.TaskName ?? string.Empty,
-            Action = x.CurrentStatus is DeclarationStatus.PreReviewRejected or DeclarationStatus.InitialReviewRejected ? "修改" : "查看"
+            Action = x.CurrentStatus is DeclarationStatus.PreReviewRejected or DeclarationStatus.InitialReviewRejected or DeclarationStatus.Draft
+                ? "修改"
+                : "查看"
         }).ToList();
 
         return new PagedResultDto<DeclarationListItemDto>
@@ -199,24 +224,31 @@ public class DeclarationService : IDeclarationService
             throw new InvalidOperationException("仅申报人可上传附件");
         }
 
-        var saved = await _fileStorageService.SaveAsync(file, $"declarations/{declarationId}", cancellationToken);
-        var attachment = new DeclarationAttachment
-        {
-            DeclarationId = declarationId,
-            OriginalFileName = file.FileName,
-            StorageFileName = saved.StorageFileName,
-            StoragePath = saved.StoragePath,
-            FileSizeBytes = saved.Size,
-            ContentType = file.ContentType,
-            UploadedByUserId = uploaderId,
-            UploadedAt = DateTime.UtcNow,
-            CreatedAt = DateTime.UtcNow,
-            IsDeleted = false
-        };
+        EnsureCanEdit(declaration);
 
-        await _dbContext.DeclarationAttachments.AddAsync(attachment, cancellationToken);
-        await _dbContext.SaveChangesAsync(cancellationToken);
-        return attachment.Id;
+        return await SaveAttachmentAsync(
+            declarationId,
+            null,
+            uploaderId,
+            file,
+            $"declarations/{declarationId}",
+            cancellationToken);
+    }
+
+    public async Task<long> UploadTemporaryAttachmentAsync(string tempAttachmentKey, long uploaderId, IFormFile file, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(tempAttachmentKey))
+        {
+            throw new InvalidOperationException("临时附件标识不能为空");
+        }
+
+        return await SaveAttachmentAsync(
+            null,
+            tempAttachmentKey.Trim(),
+            uploaderId,
+            file,
+            Path.Combine("declarations", "temp", uploaderId.ToString(), tempAttachmentKey.Trim()),
+            cancellationToken);
     }
 
     public async Task<(byte[] Content, string FileName, string ContentType)> DownloadAttachmentAsync(long attachmentId, long currentUserId, CancellationToken cancellationToken = default)
@@ -255,6 +287,155 @@ public class DeclarationService : IDeclarationService
                 UploadedAt = x.UploadedAt
             })
             .ToListAsync(cancellationToken);
+    }
+
+    public async Task<List<AttachmentDto>> GetTemporaryAttachmentsAsync(string tempAttachmentKey, long currentUserId, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(tempAttachmentKey))
+        {
+            return [];
+        }
+
+        return await _dbContext.DeclarationAttachments
+            .AsNoTracking()
+            .Where(x => x.TempAttachmentKey == tempAttachmentKey.Trim() && x.UploadedByUserId == currentUserId && !x.IsDeleted)
+            .OrderByDescending(x => x.UploadedAt)
+            .Select(x => new AttachmentDto
+            {
+                Id = x.Id,
+                OriginalFileName = x.OriginalFileName,
+                FileSizeBytes = x.FileSizeBytes,
+                UploadedAt = x.UploadedAt
+            })
+            .ToListAsync(cancellationToken);
+    }
+
+    public async Task ClearTemporaryAttachmentsAsync(string tempAttachmentKey, long currentUserId, CancellationToken cancellationToken = default)
+    {
+        if (string.IsNullOrWhiteSpace(tempAttachmentKey))
+        {
+            return;
+        }
+
+        var attachments = await _dbContext.DeclarationAttachments
+            .Where(x => x.TempAttachmentKey == tempAttachmentKey.Trim() && x.UploadedByUserId == currentUserId && !x.IsDeleted)
+            .ToListAsync(cancellationToken);
+
+        foreach (var attachment in attachments)
+        {
+            attachment.IsDeleted = true;
+            attachment.TempAttachmentKey = null;
+            await _fileStorageService.DeleteAsync(attachment.StoragePath, cancellationToken);
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private async Task<long> SaveAttachmentAsync(
+        long? declarationId,
+        string? tempAttachmentKey,
+        long uploaderId,
+        IFormFile file,
+        string subFolder,
+        CancellationToken cancellationToken)
+    {
+        var saved = await _fileStorageService.SaveAsync(file, subFolder, cancellationToken);
+        var attachment = new DeclarationAttachment
+        {
+            DeclarationId = declarationId,
+            TempAttachmentKey = tempAttachmentKey,
+            OriginalFileName = file.FileName,
+            StorageFileName = saved.StorageFileName,
+            StoragePath = saved.StoragePath,
+            FileSizeBytes = saved.Size,
+            ContentType = file.ContentType,
+            UploadedByUserId = uploaderId,
+            UploadedAt = DateTime.UtcNow,
+            CreatedAt = DateTime.UtcNow,
+            IsDeleted = false
+        };
+
+        await _dbContext.DeclarationAttachments.AddAsync(attachment, cancellationToken);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return attachment.Id;
+    }
+
+    private async Task BindTemporaryAttachmentsAsync(string tempAttachmentKey, long currentUserId, long declarationId, CancellationToken cancellationToken)
+    {
+        var attachments = await _dbContext.DeclarationAttachments
+            .Where(x => x.TempAttachmentKey == tempAttachmentKey.Trim() && x.UploadedByUserId == currentUserId && !x.IsDeleted)
+            .ToListAsync(cancellationToken);
+
+        if (attachments.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var attachment in attachments)
+        {
+            attachment.DeclarationId = declarationId;
+            attachment.TempAttachmentKey = null;
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+    }
+
+    private static void ApplyDeclarationChanges(Declaration entity, SaveDeclarationRequestDto request)
+    {
+        entity.TaskId = request.TaskId;
+        entity.PrincipalName = request.PrincipalName;
+        entity.ContactPhone = request.ContactPhone;
+        entity.DepartmentId = request.DepartmentId;
+        entity.ProjectName = request.ProjectName;
+        entity.ProjectCategoryId = request.ProjectCategoryId;
+        entity.ProjectLevel = request.ProjectLevel;
+        entity.AwardLevel = request.AwardLevel;
+        entity.ParticipationType = request.ParticipationType;
+        entity.ApprovalDocumentName = request.ApprovalDocumentName;
+        entity.SealUnitAndDate = request.SealUnitAndDate;
+        entity.ProjectContent = request.ProjectContent;
+        entity.ProjectAchievement = request.ProjectAchievement;
+    }
+
+    private static void ApplyDeclarationChanges(Declaration entity, DeclarationSubmitRequestDto request)
+    {
+        entity.TaskId = request.TaskId;
+        entity.PrincipalName = request.PrincipalName;
+        entity.ContactPhone = request.ContactPhone;
+        entity.DepartmentId = request.DepartmentId;
+        entity.ProjectName = request.ProjectName;
+        entity.ProjectCategoryId = request.ProjectCategoryId;
+        entity.ProjectLevel = request.ProjectLevel;
+        entity.AwardLevel = request.AwardLevel;
+        entity.ParticipationType = request.ParticipationType;
+        entity.ApprovalDocumentName = request.ApprovalDocumentName;
+        entity.SealUnitAndDate = request.SealUnitAndDate;
+        entity.ProjectContent = request.ProjectContent;
+        entity.ProjectAchievement = request.ProjectAchievement;
+    }
+
+    private static void EnsureCanEdit(Declaration entity)
+    {
+        if (entity.CurrentStatus is not (DeclarationStatus.Draft or DeclarationStatus.PreReviewRejected or DeclarationStatus.InitialReviewRejected))
+        {
+            throw new InvalidOperationException("当前状态不可修改");
+        }
+    }
+
+    private static void ValidateDateRange(DateTime? startDate, DateTime? endDate)
+    {
+        if (startDate.HasValue && endDate.HasValue && startDate.Value.Date > endDate.Value.Date)
+        {
+            throw new InvalidOperationException("开始日期不能晚于结束日期");
+        }
+    }
+
+    private static void ValidateSubmitRequest(DeclarationSubmitRequestDto request)
+    {
+        if (request.TaskId <= 0)
+        {
+            throw new InvalidOperationException("申报任务不能为空");
+        }
     }
 
     private async Task EnsureCanAccessDeclarationAsync(Declaration declaration, long currentUserId, CancellationToken cancellationToken)

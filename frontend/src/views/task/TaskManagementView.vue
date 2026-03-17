@@ -20,6 +20,15 @@ const windowForm = reactive({
   endAt: ''
 });
 
+const validateRange = (startAt: string, endAt: string) => {
+  if (startAt && endAt && startAt > endAt) {
+    ElMessage.warning('开始时间不能晚于结束时间');
+    return false;
+  }
+
+  return true;
+};
+
 const loadData = async () => {
   const res = await listTasksApi();
   rows.value = res.data.data;
@@ -33,6 +42,10 @@ const openWindowDialog = (row: TaskItem) => {
 };
 
 const createTask = async () => {
+  if (!validateRange(createForm.startAt, createForm.endAt)) {
+    return;
+  }
+
   await createTaskApi(createForm);
   ElMessage.success('任务创建成功');
   createDialogVisible.value = false;
@@ -40,6 +53,10 @@ const createTask = async () => {
 };
 
 const updateWindow = async () => {
+  if (!validateRange(windowForm.startAt, windowForm.endAt)) {
+    return;
+  }
+
   await updateTaskWindowApi(windowForm.id, {
     startAt: windowForm.startAt,
     endAt: windowForm.endAt

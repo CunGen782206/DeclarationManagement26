@@ -35,7 +35,20 @@ const actionForm = reactive({
   remark: ''
 });
 
+const validateRange = () => {
+  if (query.startDate && query.endDate && query.startDate > query.endDate) {
+    ElMessage.warning('开始日期不能晚于结束日期');
+    return false;
+  }
+
+  return true;
+};
+
 const loadData = async () => {
+  if (!validateRange()) {
+    return;
+  }
+
   const res = await getPendingReviewsApi(query);
   rows.value = res.data.data.items;
   total.value = res.data.data.totalCount;

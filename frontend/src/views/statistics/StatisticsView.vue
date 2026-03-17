@@ -27,18 +27,39 @@ const downloadBlob = (blob: Blob, filename: string) => {
   window.URL.revokeObjectURL(url);
 };
 
+const validateRange = () => {
+  if (query.startDate && query.endDate && query.startDate > query.endDate) {
+    ElMessage.warning('开始日期不能晚于结束日期');
+    return false;
+  }
+
+  return true;
+};
+
 const load = async () => {
+  if (!validateRange()) {
+    return;
+  }
+
   const res = await queryStatisticsApi(query);
   rows.value = res.data.data;
 };
 
 const exportExcel = async () => {
+  if (!validateRange()) {
+    return;
+  }
+
   const res = await exportExcelApi(query);
   downloadBlob(res.data, '统计导出.xlsx');
   ElMessage.success('Excel 导出成功');
 };
 
 const exportArchive = async () => {
+  if (!validateRange()) {
+    return;
+  }
+
   const res = await exportArchiveApi(query);
   downloadBlob(res.data, '归档导出.zip');
   ElMessage.success('归档导出成功');

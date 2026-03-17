@@ -17,16 +17,26 @@ public class SaveDeclarationRequestDto
     public string? SealUnitAndDate { get; set; }
     public string? ProjectContent { get; set; }
     public string? ProjectAchievement { get; set; }
+    public string? TempAttachmentKey { get; set; }
 }
 
 public class DeclarationSubmitRequestDto
 {
-    public long DeclarationId { get; set; }
-}
-
-public class DeclarationResubmitRequestDto
-{
-    public long DeclarationId { get; set; }
+    public long? DeclarationId { get; set; }
+    public long TaskId { get; set; }
+    public string PrincipalName { get; set; } = string.Empty;
+    public string ContactPhone { get; set; } = string.Empty;
+    public long DepartmentId { get; set; }
+    public string ProjectName { get; set; } = string.Empty;
+    public long ProjectCategoryId { get; set; }
+    public ProjectLevel ProjectLevel { get; set; }
+    public AwardLevel AwardLevel { get; set; }
+    public ParticipationType ParticipationType { get; set; }
+    public string? ApprovalDocumentName { get; set; }
+    public string? SealUnitAndDate { get; set; }
+    public string? ProjectContent { get; set; }
+    public string? ProjectAchievement { get; set; }
+    public string? TempAttachmentKey { get; set; }
 }
 
 public class DeclarationDetailDto
@@ -88,6 +98,11 @@ public class AttachmentDto
     public string OriginalFileName { get; set; } = string.Empty;
     public long FileSizeBytes { get; set; }
     public DateTime UploadedAt { get; set; }
+}
+
+public class TemporaryAttachmentQueryDto
+{
+    public string TempAttachmentKey { get; set; } = string.Empty;
 }
 
 public class PagedResultDto<T>
