@@ -93,6 +93,45 @@ public class ReviewRecordDto
 }
 
 /// <summary>
+/// 流程日志数据传输对象类。
+/// </summary>
+public class FlowLogDto
+{
+    /// <summary>
+    /// 日志ID属性。
+    /// </summary>
+    public long Id { get; set; }
+    /// <summary>
+    /// 申报ID属性。
+    /// </summary>
+    public long DeclarationId { get; set; }
+    /// <summary>
+    /// 来源状态属性。
+    /// </summary>
+    public DeclarationStatus? FromStatus { get; set; }
+    /// <summary>
+    /// 目标状态属性。
+    /// </summary>
+    public DeclarationStatus ToStatus { get; set; }
+    /// <summary>
+    /// 动作类型属性。
+    /// </summary>
+    public FlowActionType ActionType { get; set; }
+    /// <summary>
+    /// 操作人用户ID属性。
+    /// </summary>
+    public long OperatorUserId { get; set; }
+    /// <summary>
+    /// 备注属性。
+    /// </summary>
+    public string? Note { get; set; }
+    /// <summary>
+    /// 创建时间属性。
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
+}
+
+/// <summary>
 /// 待处理审核查询数据传输对象类。
 /// </summary>
 public class PendingReviewQueryDto
