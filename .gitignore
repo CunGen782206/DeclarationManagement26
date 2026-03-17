@@ -1,0 +1,8 @@
+frontend/node_modules/
+frontend/dist/
+frontend/src/**/*.js
+frontend/*.tsbuildinfo
+src/**/bin/
+src/**/obj/
+.tools/
+*.log

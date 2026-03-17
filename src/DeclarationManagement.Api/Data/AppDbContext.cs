@@ -72,6 +72,10 @@ public class AppDbContext : DbContext
             entity.Property(x => x.FullName).HasMaxLength(50).IsRequired();
             entity.Property(x => x.PasswordHash).HasMaxLength(200).IsRequired();
             entity.Property(x => x.PasswordSalt).HasMaxLength(200);
+            entity.HasOne(x => x.Department)
+                .WithMany(x => x.Users)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.Restrict);
         });
 
         // Departments
@@ -95,6 +99,14 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("UserPreReviewDepartments");
             entity.HasKey(x => new { x.UserId, x.DepartmentId });
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.UserPreReviewDepartments)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(x => x.Department)
+                .WithMany(x => x.UserPreReviewDepartments)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // UserInitialReviewCategories（复合主键）
@@ -102,6 +114,14 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("UserInitialReviewCategories");
             entity.HasKey(x => new { x.UserId, x.ProjectCategoryId });
+            entity.HasOne(x => x.User)
+                .WithMany(x => x.UserInitialReviewCategories)
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(x => x.ProjectCategory)
+                .WithMany(x => x.UserInitialReviewCategories)
+                .HasForeignKey(x => x.ProjectCategoryId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // DeclarationTasks
@@ -109,6 +129,10 @@ public class AppDbContext : DbContext
         {
             entity.ToTable("DeclarationTasks");
             entity.Property(x => x.TaskName).HasMaxLength(200).IsRequired();
+            entity.HasOne(x => x.CreatedByUser)
+                .WithMany()
+                .HasForeignKey(x => x.CreatedByUserId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // Declarations
@@ -120,6 +144,22 @@ public class AppDbContext : DbContext
             entity.Property(x => x.ProjectName).HasMaxLength(300).IsRequired();
             entity.Property(x => x.ApprovalDocumentName).HasMaxLength(300);
             entity.Property(x => x.SealUnitAndDate).HasMaxLength(300);
+            entity.HasOne(x => x.Task)
+                .WithMany(x => x.Declarations)
+                .HasForeignKey(x => x.TaskId)
+                .OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(x => x.ApplicantUser)
+                .WithMany()
+                .HasForeignKey(x => x.ApplicantUserId)
+                .OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(x => x.Department)
+                .WithMany(x => x.Declarations)
+                .HasForeignKey(x => x.DepartmentId)
+                .OnDelete(DeleteBehavior.NoAction);
+            entity.HasOne(x => x.ProjectCategory)
+                .WithMany(x => x.Declarations)
+                .HasForeignKey(x => x.ProjectCategoryId)
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         // DeclarationAttachments

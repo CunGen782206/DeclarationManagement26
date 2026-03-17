@@ -7,7 +7,7 @@ namespace DeclarationManagement.Api.Services;
 /// </summary>
 public interface IUserService
 {
-    Task<List<UserDto>> GetListAsync(CancellationToken cancellationToken = default);
+    Task<List<UserDto>> GetListAsync(UserQueryDto query, CancellationToken cancellationToken = default);
     Task<long> CreateAsync(CreateUserRequestDto request, CancellationToken cancellationToken = default);
     Task UpdateAsync(long userId, UpdateUserRequestDto request, CancellationToken cancellationToken = default);
     Task DeleteAsync(long userId, CancellationToken cancellationToken = default);

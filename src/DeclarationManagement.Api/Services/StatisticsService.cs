@@ -4,71 +4,67 @@ using DeclarationManagement.Api.DTOs;
 using DeclarationManagement.Api.Entities;
 using Microsoft.EntityFrameworkCore;
 using QuestPDF.Fluent;
-using QuestPDF.Helpers;
 using QuestPDF.Infrastructure;
 using System.IO.Compression;
 
 namespace DeclarationManagement.Api.Services;
 
-/// <summary>
-/// 统计服务类。
-/// </summary>
 public class StatisticsService : IStatisticsService
 {
-    /// <summary>
-    /// 数据库上下文，用于统计查询与导出。
-    /// </summary>
     private readonly AppDbContext _dbContext;
 
-    /// <summary>
-    /// 构造函数。
-    /// </summary>
     public StatisticsService(AppDbContext dbContext)
     {
         _dbContext = dbContext;
         QuestPDF.Settings.License = LicenseType.Community;
     }
 
-    /// <summary>
-    /// 查询统计列表（按筛选条件返回申报集合）。
-    /// </summary>
     public async Task<List<StatisticsItemDto>> QueryAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
-        // q：可继续叠加条件的查询对象
-        var q = BuildQuery(query); // q：查询对象
-        // data：数据库结果集
-        var data = await q.ToListAsync(cancellationToken); // data：数据
+        var data = await BuildQuery(query).ToListAsync(cancellationToken);
         return data.Select(ToDto).ToList();
     }
 
-    /// <summary>
-    /// 导出 Excel（基于当前筛选结果）。
-    /// </summary>
     public async Task<ExportFileDto> ExportExcelAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
-        // data：待导出的申报数据
-        var data = await BuildQuery(query).ToListAsync(cancellationToken); // data：数据
+        var data = await BuildQuery(query).ToListAsync(cancellationToken);
 
         using var workbook = new XLWorkbook();
-        var ws = workbook.AddWorksheet("统计导出"); // ws：工作表
+        var ws = workbook.AddWorksheet("统计导出");
 
-        string[] headers = ["序号", "部门", "项目名称", "项目类别", "项目等级", "奖项级别", "参与形式", "负责人", "联系方式", "处理意见"]; // headers：表头
-        for (var i = 0; i < headers.Length; i++) ws.Cell(1, i + 1).Value = headers[i];
+        string[] headers =
+        [
+            "序号", "部门", "项目名称", "项目类别", "项目等级", "奖项级别", "参与形式", "负责人", "联系方式",
+            "盖章单位及时间", "审核部门", "处理意见", "原因", "认定项目等级", "认定奖项级别", "认定金额", "备注"
+        ];
+
+        for (var i = 0; i < headers.Length; i++)
+        {
+            ws.Cell(1, i + 1).Value = headers[i];
+        }
 
         for (var i = 0; i < data.Count; i++)
         {
-            var row = i + 2; // row：行
-            var d = data[i]; // d：申报对象
+            var row = i + 2;
+            var item = ToDto(data[i]);
+
             ws.Cell(row, 1).Value = i + 1;
-            ws.Cell(row, 2).Value = d.Department?.Name ?? string.Empty;
-            ws.Cell(row, 3).Value = d.ProjectName;
-            ws.Cell(row, 4).Value = d.ProjectCategory?.Name ?? string.Empty;
-            ws.Cell(row, 5).Value = d.ProjectLevel.ToString();
-            ws.Cell(row, 6).Value = d.AwardLevel.ToString();
-            ws.Cell(row, 7).Value = d.ParticipationType.ToString();
-            ws.Cell(row, 8).Value = d.PrincipalName;
-            ws.Cell(row, 9).Value = d.ContactPhone;
-            ws.Cell(row, 10).Value = d.CurrentStatus.ToString();
+            ws.Cell(row, 2).Value = item.DepartmentName;
+            ws.Cell(row, 3).Value = item.ProjectName;
+            ws.Cell(row, 4).Value = item.ProjectCategoryName;
+            ws.Cell(row, 5).Value = item.ProjectLevel.ToString();
+            ws.Cell(row, 6).Value = item.AwardLevel.ToString();
+            ws.Cell(row, 7).Value = item.ParticipationType.ToString();
+            ws.Cell(row, 8).Value = item.ApplicantName;
+            ws.Cell(row, 9).Value = item.ContactPhone;
+            ws.Cell(row, 10).Value = item.SealUnitAndDate ?? string.Empty;
+            ws.Cell(row, 11).Value = item.FinalReviewDepartmentName;
+            ws.Cell(row, 12).Value = item.StatusName;
+            ws.Cell(row, 13).Value = item.ReviewReason ?? string.Empty;
+            ws.Cell(row, 14).Value = item.RecognizedProjectLevel?.ToString() ?? string.Empty;
+            ws.Cell(row, 15).Value = item.RecognizedAwardLevel?.ToString() ?? string.Empty;
+            ws.Cell(row, 16).Value = item.RecognizedAmount;
+            ws.Cell(row, 17).Value = item.Remark ?? string.Empty;
         }
 
         ws.Columns().AdjustToContents();
@@ -84,39 +80,36 @@ public class StatisticsService : IStatisticsService
         };
     }
 
-    /// <summary>
-    /// 归档导出 ZIP：仅导出初审通过表单，包含 PDF 与附件。
-    /// </summary>
     public async Task<ExportFileDto> ExportArchiveAsync(StatisticsQueryDto query, CancellationToken cancellationToken = default)
     {
-        // data：归档候选集（只保留初审通过）
         var data = await BuildQuery(query)
             .Where(x => x.CurrentStatus == DeclarationStatus.InitialReviewApproved)
-            .Include(x => x.Attachments)
             .ToListAsync(cancellationToken);
 
-        // zipStream：最终压缩包内存流
         await using var zipStream = new MemoryStream();
         using (var archive = new ZipArchive(zipStream, ZipArchiveMode.Create, true))
         {
-            foreach (var d in data)
+            foreach (var declaration in data)
             {
-                // folder：每个表单归档目录（部门-负责人-项目名称）
-                var folder = Sanitize($"{d.Department?.Name}-{d.PrincipalName}-{d.ProjectName}"); // folder：文件夹
-                var pdfPath = $"{folder}/{folder}.pdf"; // pdfPath：PDF路径
-                var pdfEntry = archive.CreateEntry(pdfPath); // pdfEntry：PDF条目
+                var folder = Sanitize($"{declaration.Department?.Name}-{declaration.PrincipalName}-{declaration.ProjectName}");
+                var pdfEntry = archive.CreateEntry($"{folder}/{folder}.pdf");
+
                 await using (var entryStream = pdfEntry.Open())
                 {
-                    var bytes = BuildDeclarationPdf(d); // bytes：字节
+                    var bytes = BuildDeclarationPdf(declaration);
                     await entryStream.WriteAsync(bytes, cancellationToken);
                 }
 
-                foreach (var a in d.Attachments.Where(x => !x.IsDeleted))
+                foreach (var attachment in declaration.Attachments.Where(x => !x.IsDeleted))
                 {
-                    if (!File.Exists(a.StoragePath)) continue;
-                    var fileEntry = archive.CreateEntry($"{folder}/附件/{a.OriginalFileName}"); // fileEntry：文件条目
+                    if (!File.Exists(attachment.StoragePath))
+                    {
+                        continue;
+                    }
+
+                    var fileEntry = archive.CreateEntry($"{folder}/附件/{attachment.OriginalFileName}");
                     await using var entryStream = fileEntry.Open();
-                    var bytes = await File.ReadAllBytesAsync(a.StoragePath, cancellationToken); // bytes：字节
+                    var bytes = await File.ReadAllBytesAsync(attachment.StoragePath, cancellationToken);
                     await entryStream.WriteAsync(bytes, cancellationToken);
                 }
             }
@@ -130,9 +123,6 @@ public class StatisticsService : IStatisticsService
         };
     }
 
-    /// <summary>
-    /// 构建统计查询（统一复用筛选逻辑）。
-    /// </summary>
     private IQueryable<Declaration> BuildQuery(StatisticsQueryDto query)
     {
         var q = _dbContext.Declarations
@@ -140,36 +130,73 @@ public class StatisticsService : IStatisticsService
             .Include(x => x.Department)
             .Include(x => x.ProjectCategory)
             .Include(x => x.Attachments)
+            .Include(x => x.ReviewRecords)
             .AsQueryable();
 
-        if (query.TaskId.HasValue) q = q.Where(x => x.TaskId == query.TaskId.Value);
-        if (query.StartDate.HasValue) q = q.Where(x => x.SubmittedAt >= query.StartDate.Value);
-        if (query.EndDate.HasValue) q = q.Where(x => x.SubmittedAt <= query.EndDate.Value);
-        if (query.DepartmentIds is { Count: > 0 }) q = q.Where(x => query.DepartmentIds.Contains(x.DepartmentId));
-        if (query.CategoryIds is { Count: > 0 }) q = q.Where(x => query.CategoryIds.Contains(x.ProjectCategoryId));
-        if (query.Statuses is { Count: > 0 }) q = q.Where(x => query.Statuses.Contains(x.CurrentStatus));
+        if (query.TaskId.HasValue)
+        {
+            q = q.Where(x => x.TaskId == query.TaskId.Value);
+        }
+
+        if (query.StartDate.HasValue)
+        {
+            q = q.Where(x => x.SubmittedAt >= query.StartDate.Value);
+        }
+
+        if (query.EndDate.HasValue)
+        {
+            q = q.Where(x => x.SubmittedAt <= query.EndDate.Value);
+        }
+
+        if (query.DepartmentIds is { Count: > 0 })
+        {
+            q = q.Where(x => query.DepartmentIds.Contains(x.DepartmentId));
+        }
+
+        if (query.CategoryIds is { Count: > 0 })
+        {
+            q = q.Where(x => query.CategoryIds.Contains(x.ProjectCategoryId));
+        }
+
+        if (query.Statuses is { Count: > 0 })
+        {
+            q = q.Where(x => query.Statuses.Contains(x.CurrentStatus));
+        }
 
         return q;
     }
 
-    /// <summary>
-    /// 将申报实体映射为统计列表 DTO。
-    /// </summary>
-    private static StatisticsItemDto ToDto(Declaration x) => new()
+    private static StatisticsItemDto ToDto(Declaration declaration)
     {
-        DeclarationId = x.Id,
-        ProjectName = x.ProjectName,
-        DepartmentName = x.Department?.Name ?? string.Empty,
-        ApplicantName = x.PrincipalName,
-        ContactPhone = x.ContactPhone,
-        Status = x.CurrentStatus,
-        SubmittedAt = x.SubmittedAt
-    };
+        var latestReview = declaration.ReviewRecords
+            .OrderByDescending(x => x.ReviewedAt)
+            .FirstOrDefault();
 
-    /// <summary>
-    /// 生成单份申报 PDF。
-    /// </summary>
-    private static byte[] BuildDeclarationPdf(Declaration d)
+        return new StatisticsItemDto
+        {
+            DeclarationId = declaration.Id,
+            ProjectName = declaration.ProjectName,
+            ProjectCategoryName = declaration.ProjectCategory?.Name ?? string.Empty,
+            DepartmentName = declaration.Department?.Name ?? string.Empty,
+            ApplicantName = declaration.PrincipalName,
+            ProjectLevel = declaration.ProjectLevel,
+            AwardLevel = declaration.AwardLevel,
+            ParticipationType = declaration.ParticipationType,
+            ContactPhone = declaration.ContactPhone,
+            SealUnitAndDate = declaration.SealUnitAndDate,
+            FinalReviewDepartmentName = ResolveFinalReviewDepartmentName(declaration),
+            StatusName = declaration.CurrentStatus.ToString(),
+            ReviewReason = latestReview?.Reason,
+            RecognizedProjectLevel = latestReview?.RecognizedProjectLevel,
+            RecognizedAwardLevel = latestReview?.RecognizedAwardLevel,
+            RecognizedAmount = latestReview?.RecognizedAmount,
+            Remark = latestReview?.Remark,
+            Status = declaration.CurrentStatus,
+            SubmittedAt = declaration.SubmittedAt
+        };
+    }
+
+    private static byte[] BuildDeclarationPdf(Declaration declaration)
     {
         return Document.Create(container =>
         {
@@ -179,21 +206,28 @@ public class StatisticsService : IStatisticsService
                 page.Content().Column(col =>
                 {
                     col.Item().Text("教学质量工程项目申报表").FontSize(18).Bold();
-                    col.Item().Text($"项目名称：{d.ProjectName}");
-                    col.Item().Text($"负责人：{d.PrincipalName}");
-                    col.Item().Text($"所属部门：{d.Department?.Name}");
-                    col.Item().Text($"项目类别：{d.ProjectCategory?.Name}");
-                    col.Item().Text($"项目内容：{d.ProjectContent}");
-                    col.Item().Text($"项目成果：{d.ProjectAchievement}");
-                    col.Item().Text($"状态：{d.CurrentStatus}");
+                    col.Item().Text($"项目名称：{declaration.ProjectName}");
+                    col.Item().Text($"负责人：{declaration.PrincipalName}");
+                    col.Item().Text($"所属部门：{declaration.Department?.Name}");
+                    col.Item().Text($"项目类别：{declaration.ProjectCategory?.Name}");
+                    col.Item().Text($"项目内容：{declaration.ProjectContent}");
+                    col.Item().Text($"项目成果：{declaration.ProjectAchievement}");
+                    col.Item().Text($"状态：{declaration.CurrentStatus}");
                 });
             });
         }).GeneratePdf();
     }
 
-    /// <summary>
-    /// 清理非法文件名字符，避免生成目录失败。
-    /// </summary>
+    private static string ResolveFinalReviewDepartmentName(Declaration declaration)
+    {
+        return declaration.CurrentStatus switch
+        {
+            DeclarationStatus.PendingInitialReview or DeclarationStatus.InitialReviewApproved or DeclarationStatus.InitialReviewNotPassed or DeclarationStatus.InitialReviewRejected => "初审",
+            DeclarationStatus.PendingPreReview or DeclarationStatus.PreReviewNotPassed or DeclarationStatus.PreReviewRejected => declaration.Department?.Name ?? string.Empty,
+            _ => string.Empty
+        };
+    }
+
     private static string Sanitize(string name)
     {
         foreach (var c in Path.GetInvalidFileNameChars())

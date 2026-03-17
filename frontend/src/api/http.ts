@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus';
 import type { ApiResponse } from '@/types/common';
 
 const http = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL ?? '/api',
   timeout: 15000
 });
 

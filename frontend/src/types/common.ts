@@ -22,6 +22,11 @@ export enum DeclarationStatus {
   InitialReviewApproved = 8
 }
 
+export enum ReviewStage {
+  PreReview = 1,
+  InitialReview = 2
+}
+
 export enum ReviewAction {
   Pass = 1,
   NotPass = 2,
